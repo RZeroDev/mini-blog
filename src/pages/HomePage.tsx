@@ -26,6 +26,7 @@ const HomePage = () => {
           getRecentPosts(6),
           getCategories(),
         ]);
+        console.log("Posts récupérés:", postsData);
         setRecentPosts(postsData);
         setCategories(categoriesData.slice(0, 8));
       } catch (error) {
