@@ -35,7 +35,6 @@ const ContactPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <BlogHeader />
 
       {/* Hero Section */}
       <section className="bg-white border-b border-gray-200">

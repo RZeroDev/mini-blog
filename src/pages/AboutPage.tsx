@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { BlogHeader } from "@/components/blog-header";
 import {
   IconArrowLeft,
   IconTarget,
@@ -11,7 +10,6 @@ import {
 const AboutPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <BlogHeader />
 
       {/* Hero Section */}
       <section className="bg-white border-b border-gray-200">
@@ -113,7 +111,7 @@ const AboutPage = () => {
           </div>
 
           {/* CTA */}
-          <div className="bg-gray-900 text-white rounded-lg p-8 text-center">
+          <div className="bg-primary text-white rounded-lg p-8 text-center">
             <h2 className="text-3xl font-bold mb-4">
               Rejoignez notre communauté
             </h2>

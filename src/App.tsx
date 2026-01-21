@@ -10,34 +10,44 @@ import PostDetailPage from "./pages/PostDetailPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import TermsPage from "./pages/TermsPage";
+import LegalPage from "./pages/LegalPage";
 import { AuthProvider } from "./components/AuthProvider";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { GuestRoute } from "./components/GuestRoute";
+import { Layout } from "./components/Layout";
 
 const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Routes publiques */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/categories" element={<AllCategoriesPage />} />
-          <Route path="/category/:slug" element={<CategoryPage />} />
-          <Route path="/post/:slug" element={<PostDetailPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+          {/* Routes publiques avec Layout */}
+          <Route path="/" element={<Layout><HomePage /></Layout>} />
+          <Route path="/categories" element={<Layout><AllCategoriesPage /></Layout>} />
+          <Route path="/category/:slug" element={<Layout><CategoryPage /></Layout>} />
+          <Route path="/post/:slug" element={<Layout><PostDetailPage /></Layout>} />
+          <Route path="/about" element={<Layout><AboutPage /></Layout>} />
+          <Route path="/contact" element={<Layout><ContactPage /></Layout>} />
+          <Route path="/posts" element={<Layout><AllCategoriesPage /></Layout>} />
+          <Route path="/privacy" element={<Layout><PrivacyPage /></Layout>} />
+          <Route path="/terms" element={<Layout><TermsPage /></Layout>} />
+          <Route path="/legal" element={<Layout><LegalPage /></Layout>} />
           
           {/* Route de connexion (seulement pour non-connectés) */}
           <Route
             path="/login"
             element={
               <GuestRoute>
-                <LoginPage />
+                <Layout>
+                  <LoginPage />
+                </Layout>
               </GuestRoute>
             }
           />
           
-          {/* Route Dashboard (protégée - authentification requise) */}
+          {/* Route Dashboard (protégée - authentification requise) - Sans Layout */}
           <Route
             path="/dashboard"
             element={
@@ -47,7 +57,7 @@ const App = () => {
             }
           />
 
-          {/* Route Catégories (protégée) */}
+          {/* Route Catégories (protégée) - Sans Layout */}
           <Route
             path="/dashboard/categories"
             element={
@@ -57,7 +67,7 @@ const App = () => {
             }
           />
 
-          {/* Route Articles (protégée) */}
+          {/* Route Articles (protégée) - Sans Layout */}
           <Route
             path="/dashboard/posts"
             element={
@@ -67,7 +77,7 @@ const App = () => {
             }
           />
           
-          {/* Routes Admin (protégées - rôle admin requis) */}
+          {/* Routes Admin (protégées - rôle admin requis) - Sans Layout */}
           <Route
             path="/admin/*"
             element={
@@ -77,8 +87,8 @@ const App = () => {
             }
           />
           
-          {/* Page 404 */}
-          <Route path="*" element={<NotFoundPage />} />
+          {/* Page 404 avec Layout */}
+          <Route path="*" element={<Layout><NotFoundPage /></Layout>} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

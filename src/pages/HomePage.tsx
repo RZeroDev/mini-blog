@@ -226,8 +226,6 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <BlogHeader />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Latest News Section */}
         <section className="mb-16">
@@ -291,7 +289,7 @@ const HomePage = () => {
               {/* Deuxième rangée : 3 articles */}
               {recentPosts.length > 2 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {recentPosts.slice(2, 8).map((post) => (
+                  {recentPosts.slice(2, 5).map((post) => (
                     <Link
                       key={post.id}
                       to={`/post/${post.slug || post.id}`}
@@ -649,164 +647,6 @@ const HomePage = () => {
           </p>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-primary text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {/* Company Info */}
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="flex h-8 w-8 items-center justify-center bg-white rounded-full">
-                  <span className="text-sm font-bold text-primary">MB</span>
-                </div>
-                <span className="text-xl font-bold text-white">miniblog</span>
-              </div>
-              <p className="text-sm text-white/70 mb-4 max-w-xs">
-                123 Rue de la Blog, Suite 100<br />
-                75001 Paris, France
-              </p>
-              <div className="space-y-1 text-sm text-white/70">
-                <p>Téléphone: +33 1 23 45 67 89</p>
-                <p>Email: contact@miniblog.com</p>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h3 className="font-semibold text-white mb-4 text-base">Liens rapides</h3>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link to="/" className="text-white/70 hover:text-white transition-colors">
-                    Accueil
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/categories"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Catégories
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/about"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    À propos
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/contact"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Social */}
-            <div>
-              <h3 className="font-semibold text-white mb-4 text-base">Réseaux sociaux</h3>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a
-                    href="https://facebook.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Facebook
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://instagram.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Instagram
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://linkedin.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    LinkedIn
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://twitter.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Twitter
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://youtube.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Youtube
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <h3 className="font-semibold text-white mb-4 text-base">Légal</h3>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link
-                    to="/terms"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Conditions d'utilisation
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/privacy"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Politique de confidentialité
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/cookies"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Politique des cookies
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Copyright */}
-        <div className="border-t border-white/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <p className="text-sm text-white/70">
-              © {new Date().getFullYear()} Miniblog. Tous droits réservés.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
