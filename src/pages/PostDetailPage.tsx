@@ -11,6 +11,7 @@ import {
   IconBookmark,
 } from "@tabler/icons-react";
 import { getPostBySlug } from "@/api/posts";
+import { apiUrl } from "@/api";
 import type { Post } from "@/api/posts";
 
 const PostDetailPage = () => {
@@ -83,22 +84,30 @@ const PostDetailPage = () => {
               </h1>
 
               <div className="flex flex-wrap items-center gap-4 text-gray-600">
-                <div className="flex items-center gap-2">
-                  <IconUser className="h-5 w-5" />
-                  <span className="font-medium">
-                    {post.author.firstName} {post.author.lastName}
-                  </span>
-                </div>
-                <span className="text-gray-300">•</span>
+                {(post.user || post.author) && (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <IconUser className="h-5 w-5" />
+                      <span className="font-medium">
+                        {(post.user || post.author)?.firstName} {(post.user || post.author)?.lastName}
+                      </span>
+                    </div>
+                    <span className="text-gray-300">•</span>
+                  </>
+                )}
                 <div className="flex items-center gap-2">
                   <IconClock className="h-5 w-5" />
                   <span>{formatDate(post.createdAt)}</span>
                 </div>
-                <span className="text-gray-300">•</span>
-                <div className="flex items-center gap-2">
-                  <IconEye className="h-5 w-5" />
-                  <span>{post.views} vues</span>
-                </div>
+                {post.views && (
+                  <>
+                    <span className="text-gray-300">•</span>
+                    <div className="flex items-center gap-2">
+                      <IconEye className="h-5 w-5" />
+                      <span>{post.views} vues</span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </section>
@@ -111,7 +120,7 @@ const PostDetailPage = () => {
                 {post.image && (
                   <div className="relative h-96 rounded-xl overflow-hidden mb-8 border border-gray-200">
                     <img
-                      src={post.image}
+                      src={`${apiUrl}uploads/posts/${post.image}`}
                       alt={post.title}
                       className="w-full h-full object-cover"
                     />
@@ -147,19 +156,20 @@ const PostDetailPage = () => {
                 <div className="border-t border-gray-200 my-8" />
 
                 {/* Author Card */}
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="h-16 w-16 rounded-full bg-gray-900 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
-                      {post.author.firstName[0]}
-                      {post.author.lastName[0]}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-lg text-gray-900 mb-1">
-                        {post.author.firstName} {post.author.lastName}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-3">
-                        {post.author.email}
-                      </p>
+                {(post.user || post.author) && (
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="h-16 w-16 rounded-full bg-gray-900 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                        {(post.user || post.author)?.firstName?.[0]}
+                        {(post.user || post.author)?.lastName?.[0]}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg text-gray-900 mb-1">
+                          {(post.user || post.author)?.firstName} {(post.user || post.author)?.lastName}
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-3">
+                          {(post.user || post.author)?.email}
+                        </p>
                       <p className="text-sm text-gray-700">
                         Auteur passionné partageant ses connaissances et
                         expériences.
@@ -167,6 +177,7 @@ const PostDetailPage = () => {
                     </div>
                   </div>
                 </div>
+                )}
               </article>
 
               {/* Sidebar */}

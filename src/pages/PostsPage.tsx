@@ -69,8 +69,9 @@ import {
   deletePost,
 } from "@/api/posts";
 import { getCategories } from "@/api/categories";
-import type { Post, PaginationMeta } from "@/api/posts";
+import type { Post, PaginationMeta, UpdatePostDto } from "@/api/posts";
 import type { Category } from "@/api/categories";
+import { apiUrl } from "@/api";
 import { toast } from "sonner";
 
 // Schéma de validation pour création
@@ -121,10 +122,12 @@ export default function PostsPage() {
         getCategories(),
       ]);
 
+      console.log("Posts response:", postsResponse);
       if (postsResponse && postsResponse.items) {
         setPosts(postsResponse.items);
         setPaginationMeta(postsResponse.meta);
       } else {
+        console.warn("Format de réponse inattendu:", postsResponse);
         setPosts([]);
       }
 
@@ -202,7 +205,7 @@ export default function PostsPage() {
       if (!selectedPost) return;
 
       try {
-        const updateData: any = {};
+        const updateData: UpdatePostDto = {};
         if (values.title) updateData.title = values.title;
         if (values.content) updateData.content = values.content;
         if (values.categoryId) updateData.categoryId = values.categoryId;
@@ -324,7 +327,7 @@ export default function PostsPage() {
                         <div className="flex items-center gap-4 flex-1">
                           {post.image && (
                             <img
-                              src={post.image}
+                              src={`${apiUrl}uploads/posts/${post.image}`}
                               alt={post.title}
                               className="h-16 w-16 rounded object-cover"
                             />
@@ -332,7 +335,7 @@ export default function PostsPage() {
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold truncate">{post.title}</h3>
                             <p className="text-sm text-muted-foreground">
-                              {post.category.name} • {post.views} vues
+                              {post.category.name} {post.views ? `• ${post.views} vues` : ''}
                             </p>
                             <div className="flex items-center gap-2 mt-1">
                               <span
@@ -600,7 +603,7 @@ export default function PostsPage() {
               <div className="space-y-2">
                 <Label>Nouvelle image (optionnel)</Label>
                 <ImageUpload
-                  value={selectedPost?.image}
+                  value={selectedPost?.image ? `${apiUrl}uploads/posts/${selectedPost.image}` : undefined}
                   onChange={(file) => editForm.setFieldValue("image", file)}
                   placeholder="Changer l'image"
                 />

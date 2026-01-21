@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { getPostsByCategory } from "@/api/posts";
 import { getCategories } from "@/api/categories";
+import { apiUrl } from "@/api";
 import type { Post } from "@/api/posts";
 import type { Category } from "@/api/categories";
 
@@ -124,13 +125,13 @@ const CategoryPage = () => {
               {posts.map((post) => (
                 <Link
                   key={post.id}
-                  to={`/post/${post.slug}`}
+                  to={`/post/${post.slug || post.id}`}
                   className="group bg-white rounded-lg border border-gray-200 hover:border-gray-900 overflow-hidden transition-all hover:shadow-lg"
                 >
                   {post.image && (
                     <div className="aspect-[16/9] overflow-hidden bg-gray-100">
                       <img
-                        src={post.image}
+                        src={`${apiUrl}uploads/posts/${post.image}`}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
@@ -140,20 +141,24 @@ const CategoryPage = () => {
                     <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-gray-700 transition-colors line-clamp-2">
                       {post.title}
                     </h3>
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                      <span>
-                        Par {post.author.firstName} {post.author.lastName}
-                      </span>
-                    </div>
+                    {(post.user || post.author) && (
+                      <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                        <span>
+                          Par {(post.user || post.author)?.firstName} {(post.user || post.author)?.lastName}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <div className="flex items-center gap-1">
                         <IconClock className="h-4 w-4" />
                         <span>{formatDate(post.createdAt)}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <IconEye className="h-4 w-4" />
-                        <span>{post.views}</span>
-                      </div>
+                      {post.views && (
+                        <div className="flex items-center gap-1">
+                          <IconEye className="h-4 w-4" />
+                          <span>{post.views}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Link>

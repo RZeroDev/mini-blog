@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { getRecentPosts } from "@/api/posts";
 import { getCategories } from "@/api/categories";
+import { apiUrl } from "@/api";
 import type { Post } from "@/api/posts";
 import type { Category } from "@/api/categories";
 
@@ -119,7 +120,7 @@ const HomePage = () => {
                 >
                   <div className="aspect-[4/3] overflow-hidden">
                     <img
-                      src={category.image}
+                      src={apiUrl + category.image}
                       alt={category.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -171,13 +172,13 @@ const HomePage = () => {
               {recentPosts.map((post) => (
                 <Link
                   key={post.id}
-                  to={`/post/${post.slug}`}
+                  to={`/post/${post.slug || post.id}`}
                   className="group bg-white rounded-lg border border-gray-200 hover:border-gray-900 overflow-hidden transition-all hover:shadow-lg"
                 >
                   {post.image && (
                     <div className="aspect-[16/9] overflow-hidden bg-gray-100">
                       <img
-                        src={post.image}
+                        src={`${apiUrl}uploads/posts/${post.image}`}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
@@ -197,10 +198,12 @@ const HomePage = () => {
                         <IconClock className="h-4 w-4" />
                         <span>{formatDate(post.createdAt)}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <IconEye className="h-4 w-4" />
-                        <span>{post.views}</span>
-                      </div>
+                      {post.views && (
+                        <div className="flex items-center gap-1">
+                          <IconEye className="h-4 w-4" />
+                          <span>{post.views}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Link>

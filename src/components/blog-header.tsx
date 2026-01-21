@@ -10,6 +10,7 @@ import {
 import { useAppSelector } from "@/store/hooks";
 import { getCategories } from "@/api/categories";
 import type { Category } from "@/api/categories";
+import { apiUrl } from "@/api";
 
 export function BlogHeader() {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
@@ -77,7 +78,7 @@ export function BlogHeader() {
                           className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
                         >
                           <img
-                            src={category.image}
+                            src={apiUrl + category.image}
                             alt={category.name}
                             className="h-8 w-8 rounded object-cover"
                           />

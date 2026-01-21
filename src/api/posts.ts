@@ -4,14 +4,22 @@ import { buildUrl, getAuthHeaders } from "./index";
 export interface Post {
   id: string;
   title: string;
-  slug: string;
+  slug?: string; // Optionnel car peut ne pas être dans toutes les réponses
   content: string;
   image?: string;
   published: boolean;
-  views: number;
-  authorId: string;
+  views?: number; // Optionnel car peut ne pas être dans toutes les réponses
+  authorId?: string; // Optionnel, peut être userId
+  userId?: string; // Peut être présent à la place de authorId
   categoryId: string;
-  author: {
+  user?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    picture?: string | null;
+  };
+  author?: {
     id: string;
     firstName: string;
     lastName: string;
@@ -83,7 +91,35 @@ export const getPostsPaginated = async (
     }
 
     const result = await response.json();
-    return result.data || result;
+    // Le backend retourne { data: { items: [...], meta: {...} }, message: '...' }
+    if (result.data) {
+      // Normaliser les types (limit peut être une string)
+      const normalizedMeta = {
+        ...result.data.meta,
+        limit: typeof result.data.meta.limit === 'string' 
+          ? parseInt(result.data.meta.limit, 10) 
+          : result.data.meta.limit,
+        page: typeof result.data.meta.page === 'string' 
+          ? parseInt(result.data.meta.page, 10) 
+          : result.data.meta.page,
+        total: typeof result.data.meta.total === 'string' 
+          ? parseInt(result.data.meta.total, 10) 
+          : result.data.meta.total,
+        totalPages: typeof result.data.meta.totalPages === 'string' 
+          ? parseInt(result.data.meta.totalPages, 10) 
+          : result.data.meta.totalPages,
+      };
+      return {
+        items: result.data.items || [],
+        meta: normalizedMeta,
+      };
+    }
+    // Si la structure est différente, essayer de la détecter
+    if (result.items && result.meta) {
+      return result;
+    }
+    // Fallback
+    return { items: [], meta: { total: 0, page: 1, limit: 10, totalPages: 1 } };
   } catch (error) {
     if (error instanceof Error) {
       throw error;
