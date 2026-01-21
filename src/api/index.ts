@@ -1,5 +1,5 @@
 // Configuration globale de l'API
-export const apiUrl = "http://localhost:4000/";
+export const apiUrl = "https://mini-blog-api-hi0x.onrender.com/";
 
 // Helper pour construire les URLs complètes
 export const buildUrl = (endpoint: string): string => {
