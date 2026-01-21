@@ -1,22 +1,49 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
+import DashboardPage from "./pages/DashboardPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import { AuthProvider } from "./components/AuthProvider";
+import { PrivateRoute } from "./components/PrivateRoute";
+import { GuestRoute } from "./components/GuestRoute";
 
 const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Route d'accueil */}
+          {/* Route d'accueil (public) */}
           <Route path="/" element={<HomePage />} />
           
-          {/* Route de connexion */}
-          <Route path="/login" element={<LoginPage />} />
+          {/* Route de connexion (seulement pour non-connectés) */}
+          <Route
+            path="/login"
+            element={
+              <GuestRoute>
+                <LoginPage />
+              </GuestRoute>
+            }
+          />
           
-          {/* Redirection par défaut vers login pour les routes protégées */}
-          <Route path="/admin/*" element={<Navigate to="/login" replace />} />
+          {/* Route Dashboard (protégée - authentification requise) */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <DashboardPage />
+              </PrivateRoute>
+            }
+          />
+          
+          {/* Routes Admin (protégées - rôle admin requis) */}
+          <Route
+            path="/admin/*"
+            element={
+              <PrivateRoute requiredRole="admin">
+                <DashboardPage />
+              </PrivateRoute>
+            }
+          />
           
           {/* Page 404 */}
           <Route path="*" element={<NotFoundPage />} />

@@ -66,13 +66,9 @@ export function LoginForm({
           description: `Bienvenue ${data.user.firstName} ${data.user.lastName}`,
         })
 
-        // Rediriger vers la page d'accueil ou admin selon le rôle
+        // Rediriger vers le dashboard après connexion
         setTimeout(() => {
-          if (data.user.role.name === "admin") {
-            navigate("/admin")
-          } else {
-            navigate("/")
-          }
+          navigate("/dashboard")
         }, 1000)
       } catch (error) {
         console.error("Erreur de connexion:", error)
