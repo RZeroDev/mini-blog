@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BlogHeader } from "@/components/blog-header";
 import { IconFolder, IconClock, IconBookmark } from "@tabler/icons-react";
 import { getPostsPaginated, getPostsByCategoryPaginated } from "@/api/posts";
 import { getCategories } from "@/api/categories";
@@ -15,15 +14,12 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
-  const [isLoadingMoreRecent, setIsLoadingMoreRecent] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [postsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalPosts, setTotalPosts] = useState(0);
-  const [recentPostsPage, setRecentPostsPage] = useState(1);
   const [recentPostsLimit] = useState(6);
-  const [hasMoreRecentPosts, setHasMoreRecentPosts] = useState(true);
 
   // Charger les données initiales
   useEffect(() => {
@@ -36,7 +32,6 @@ const HomePage = () => {
         ]);
         console.log("Posts récupérés:", postsData);
         setRecentPosts(postsData.items);
-        setHasMoreRecentPosts(postsData.meta.page < postsData.meta.totalPages);
         const limitedCategories = categoriesData.slice(0, 8);
         setCategories(limitedCategories);
       } catch (error) {
@@ -48,27 +43,6 @@ const HomePage = () => {
 
     fetchData();
   }, [recentPostsLimit]);
-
-  // Fonction pour charger plus de posts récents
-  const loadMoreRecentPosts = async () => {
-    if (isLoadingMoreRecent || !hasMoreRecentPosts) {
-      return;
-    }
-
-    try {
-      setIsLoadingMoreRecent(true);
-      const nextPage = recentPostsPage + 1;
-      const result = await getPostsPaginated(nextPage, recentPostsLimit);
-      
-      setRecentPosts(prev => [...prev, ...result.items]);
-      setRecentPostsPage(nextPage);
-      setHasMoreRecentPosts(result.meta.page < result.meta.totalPages);
-    } catch (error) {
-      console.error("Erreur lors du chargement de plus de posts récents:", error);
-    } finally {
-      setIsLoadingMoreRecent(false);
-    }
-  };
 
   // Charger les posts par catégorie quand la catégorie change
   useEffect(() => {
