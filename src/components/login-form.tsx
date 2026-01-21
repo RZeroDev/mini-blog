@@ -16,6 +16,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { useFormik } from "formik"
 import * as Yup from "yup"
+import { login } from "@/api/auth"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 // Schéma de validation Yup
 const loginSchema = Yup.object({
@@ -31,6 +34,9 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const navigate = useNavigate()
+  const [errorMessage, setErrorMessage] = useState<string>("")
+
   // Configuration Formik
   const formik = useFormik({
     initialValues: {
@@ -39,19 +45,25 @@ export function LoginForm({
     },
     validationSchema: loginSchema,
     onSubmit: async (values) => {
-      console.log("Données du formulaire:", values)
-      // TODO: Appel à l'API d'authentification
-      // try {
-      //   const response = await fetch('http://localhost:3000/auth/login', {
-      //     method: 'POST',
-      //     headers: { 'Content-Type': 'application/json' },
-      //     body: JSON.stringify(values),
-      //   });
-      //   const data = await response.json();
-      //   // Gérer la réponse (stocker le token, rediriger, etc.)
-      // } catch (error) {
-      //   console.error('Erreur de connexion:', error);
-      // }
+      try {
+        setErrorMessage("")
+        const data = await login(values)
+        console.log("Connexion réussie:", data)
+
+        // Rediriger vers la page d'accueil ou admin selon le rôle
+        if (data.user.role.name === "admin") {
+          navigate("/admin")
+        } else {
+          navigate("/")
+        }
+      } catch (error) {
+        console.error("Erreur de connexion:", error)
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Erreur de connexion. Veuillez réessayer."
+        )
+      }
     },
   })
 
@@ -66,6 +78,11 @@ export function LoginForm({
         </CardHeader>
         <CardContent>
           <form onSubmit={formik.handleSubmit}>
+            {errorMessage && (
+              <div className="mb-4 p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+                {errorMessage}
+              </div>
+            )}
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -126,20 +143,6 @@ export function LoginForm({
                 >
                   {formik.isSubmitting ? "Connexion..." : "Se connecter"}
                 </Button>
-                <Button
-                  variant="outline"
-                  type="button"
-                  className="w-full"
-                  disabled={formik.isSubmitting}
-                >
-                  Se connecter avec Google
-                </Button>
-                <FieldDescription className="text-center">
-                  Vous n&apos;avez pas de compte ?{" "}
-                  <a href="#" className="underline">
-                    S&apos;inscrire
-                  </a>
-                </FieldDescription>
               </Field>
             </FieldGroup>
           </form>
