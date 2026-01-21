@@ -31,10 +31,35 @@ import {
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { getDashboardStats, type DashboardStats } from "@/api/posts";
 
 export default function Dashboard() {
   const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
+  const [stats, setStats] = useState<DashboardStats>({
+    totalPosts: 0,
+    publishedPosts: 0,
+    draftPosts: 0,
+    totalCategories: 0,
+    totalViews: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await getDashboardStats();
+        setStats(data);
+      } catch (error) {
+        console.error("Erreur lors du chargement des statistiques:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <SidebarProvider>
@@ -90,9 +115,11 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">0</div>
+                <div className="text-3xl font-bold">
+                  {loading ? "..." : stats.totalPosts}
+                </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Articles publiés
+                  Articles {stats.publishedPosts > 0 && `(${stats.publishedPosts} publiés)`}
                 </p>
                 <div className="flex items-center justify-between mt-3">
                   <div className="flex items-center text-xs text-green-600">
@@ -129,7 +156,9 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">0</div>
+                <div className="text-3xl font-bold">
+                  {loading ? "..." : stats.totalCategories}
+                </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   Catégories actives
                 </p>
@@ -164,12 +193,15 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">0</div>
+                <div className="text-3xl font-bold">
+                  {loading ? "..." : stats.totalViews.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   Vues totales
                 </p>
-                <div className="flex items-center mt-2 text-xs text-muted-foreground">
-                  <span>Commence à publier pour voir les stats</span>
+                <div className="flex items-center mt-2 text-xs text-green-600">
+                  <IconTrendingUp className="h-3 w-3 mr-1" />
+                  <span>En croissance</span>
                 </div>
               </CardContent>
             </Card>

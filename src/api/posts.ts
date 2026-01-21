@@ -457,3 +457,52 @@ export const getPostsByCategoryPaginated = async (
     throw new Error("Une erreur est survenue");
   }
 };
+
+/**
+ * Obtenir les statistiques du dashboard
+ */
+export interface DashboardStats {
+  totalPosts: number;
+  publishedPosts: number;
+  draftPosts: number;
+  totalCategories: number;
+  totalViews: number;
+}
+
+export const getDashboardStats = async (): Promise<DashboardStats> => {
+  try {
+    const response = await fetch(buildUrl("posts/stats"), {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error("Erreur lors de la récupération des statistiques");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Une erreur est survenue");
+  }
+};
+
+/**
+ * Incrémenter les vues d'un post
+ */
+export const incrementPostViews = async (postId: string): Promise<void> => {
+  try {
+    const response = await fetch(buildUrl(`posts/${postId}/view`), {
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      console.error("Erreur lors de l'incrémentation des vues");
+    }
+  } catch (error) {
+    console.error("Erreur lors de l'incrémentation des vues:", error);
+  }
+};

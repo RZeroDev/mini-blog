@@ -10,7 +10,7 @@ import {
   IconHeart,
   IconBookmark,
 } from "@tabler/icons-react";
-import { getPostBySlug } from "@/api/posts";
+import { getPostBySlug, incrementPostViews } from "@/api/posts";
 import { apiUrl } from "@/api";
 import type { Post } from "@/api/posts";
 
@@ -27,6 +27,11 @@ const PostDetailPage = () => {
         setIsLoading(true);
         const data = await getPostBySlug(slug);
         setPost(data);
+        
+        // Incrémenter les vues après avoir chargé l'article
+        if (data && data.id) {
+          await incrementPostViews(data.id);
+        }
       } catch (error) {
         console.error("Erreur lors du chargement de l'article:", error);
       } finally {
