@@ -51,11 +51,12 @@ const HomePage = () => {
     const fetchPostsByCategory = async () => {
       if (selectedCategory === "all") {
         console.log("Chargement de tous les posts, nombre:", allPosts.length);
-        // Ne rien faire si allPosts n'est pas encore chargé
-        if (allPosts.length === 0) {
-          console.log("allPosts vide, attente du chargement...");
+        // Ne rien faire si on est encore en train de charger initialement
+        if (isLoading) {
+          console.log("Chargement initial en cours, attente...");
           return;
         }
+        console.log("Affichage de tous les posts:", allPosts.length);
         setFilteredPosts(allPosts);
         setCurrentPage(1);
         return;
@@ -76,7 +77,7 @@ const HomePage = () => {
     };
 
     fetchPostsByCategory();
-  }, [selectedCategory, allPosts]);
+  }, [selectedCategory, allPosts, isLoading]);
 
   // Mettre à jour les posts affichés selon la pagination
   useEffect(() => {
