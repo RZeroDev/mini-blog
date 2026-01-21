@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import Dashboard from "./pages/Dashboard";
 import CategoriesPage from "./pages/CategoriesPage";
 import PostsPage from "./pages/PostsPage";
+import LogsPage from "./pages/LogsPage";
 import CategoryPage from "./pages/CategoryPage";
 import AllCategoriesPage from "./pages/AllCategoriesPage";
 import PostDetailPage from "./pages/PostDetailPage";
@@ -73,6 +74,16 @@ const App = () => {
             element={
               <PrivateRoute>
                 <PostsPage />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Route Logs (protégée - admin uniquement) - Sans Layout */}
+          <Route
+            path="/dashboard/logs"
+            element={
+              <PrivateRoute requiredRole="admin">
+                <LogsPage />
               </PrivateRoute>
             }
           />

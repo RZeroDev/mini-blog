@@ -6,6 +6,8 @@ import {
   IconLogout,
   IconSettings,
   IconTags,
+  IconExternalLink,
+  IconActivity,
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -19,6 +21,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarGroup,
+  SidebarGroupContent,
 } from "@/components/ui/sidebar"
 import { useAppSelector } from "@/store/hooks"
 
@@ -46,6 +50,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Catégories",
         url: "/dashboard/categories",
         icon: IconTags,
+      },
+      {
+        title: "Logs système",
+        url: "/dashboard/logs",
+        icon: IconActivity,
       },
     ],
     navSecondary: [
@@ -81,6 +90,33 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
+        
+        {/* Link to visit the site */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  asChild
+                  className="group hover:bg-primary hover:text-primary-foreground transition-colors"
+                >
+                  <a 
+                    href="/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      <IconExternalLink className="h-4 w-4" />
+                      <span>Aller sur le site</span>
+                    </div>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
