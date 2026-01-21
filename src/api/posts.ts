@@ -175,7 +175,7 @@ export const getPosts = async (published?: boolean): Promise<Post[]> => {
  */
 export const getRecentPosts = async (limit: number = 6): Promise<Post[]> => {
   try {
-    const response = await fetch(buildUrl(`posts?limit=${limit}&published=true`), {
+    const response = await fetch(buildUrl(`posts?limit=${limit}&page=1`), {
       method: "GET",
     });
 
@@ -185,12 +185,19 @@ export const getRecentPosts = async (limit: number = 6): Promise<Post[]> => {
 
     const result = await response.json();
     
+    // Le backend retourne maintenant { data: { items: [...], meta: {...} }, message: '...' }
+    if (result.data && result.data.items) {
+      // Filtrer uniquement les posts publiés
+      return result.data.items.filter((post: Post) => post.published);
+    }
+    
+    // Fallback pour l'ancienne structure
     if (Array.isArray(result)) {
-      return result;
+      return result.filter((post: Post) => post.published);
     }
     
     if (result.data && Array.isArray(result.data)) {
-      return result.data;
+      return result.data.filter((post: Post) => post.published);
     }
     
     return [];
@@ -363,7 +370,7 @@ export const deletePost = async (id: string): Promise<void> => {
  */
 export const getPostsByCategory = async (categoryId: string): Promise<Post[]> => {
   try {
-    const response = await fetch(buildUrl(`posts?categoryId=${categoryId}&published=true`), {
+    const response = await fetch(buildUrl(`posts/category/${categoryId}`), {
       method: "GET",
     });
 
@@ -373,12 +380,14 @@ export const getPostsByCategory = async (categoryId: string): Promise<Post[]> =>
 
     const result = await response.json();
     
-    if (Array.isArray(result)) {
-      return result;
+    // Le backend retourne maintenant { data: [...], message: '...' } ou directement un tableau
+    if (result.data && Array.isArray(result.data)) {
+      return result.data.filter((post: Post) => post.published);
     }
     
-    if (result.data && Array.isArray(result.data)) {
-      return result.data;
+    // Fallback pour l'ancienne structure
+    if (Array.isArray(result)) {
+      return result.filter((post: Post) => post.published);
     }
     
     return [];
