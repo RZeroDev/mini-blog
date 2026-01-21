@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
-import DashboardPage from "./pages/DashboardPage";
+import Dashboard from "./pages/Dashboard";
 import NotFoundPage from "./pages/NotFoundPage";
 import { AuthProvider } from "./components/AuthProvider";
 import { PrivateRoute } from "./components/PrivateRoute";
@@ -30,7 +30,7 @@ const App = () => {
             path="/dashboard"
             element={
               <PrivateRoute>
-                <DashboardPage />
+                <Dashboard />
               </PrivateRoute>
             }
           />
@@ -40,7 +40,7 @@ const App = () => {
             path="/admin/*"
             element={
               <PrivateRoute requiredRole="admin">
-                <DashboardPage />
+                <Dashboard />
               </PrivateRoute>
             }
           />

@@ -1,20 +1,14 @@
 import * as React from "react"
 import {
-  IconCamera,
+  IconArticle,
   IconChartBar,
   IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
+  IconFileText,
   IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
+  IconLogout,
+  IconNewSection,
   IconSettings,
-  IconUsers,
+  IconTags,
 } from "@tabler/icons-react"
 
 import { NavDocuments } from "@/components/nav-documents"
@@ -30,125 +24,80 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "#",
-      icon: IconDashboard,
-    },
-    {
-      title: "Lifecycle",
-      url: "#",
-      icon: IconListDetails,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: IconChartBar,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: IconFolder,
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: IconUsers,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
-    },
-  ],
-}
+import { useAppSelector } from "@/store/hooks"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAppSelector((state) => state.auth)
+
+  const data = {
+    user: {
+      name: user ? `${user.firstName} ${user.lastName}` : "Utilisateur",
+      email: user?.email || "",
+      avatar: user?.picture || "",
+    },
+    navMain: [
+      {
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: IconDashboard,
+      },
+      {
+        title: "Statistiques",
+        url: "/dashboard/stats",
+        icon: IconChartBar,
+      },
+    ],
+    articles: [
+      {
+        title: "Articles",
+        icon: IconArticle,
+        isActive: true,
+        url: "/dashboard/posts",
+        items: [
+          {
+            title: "Tous les articles",
+            url: "/dashboard/posts",
+          },
+          {
+            title: "Nouveau",
+            url: "/dashboard/posts/new",
+          },
+          {
+            title: "Brouillons",
+            url: "/dashboard/posts/drafts",
+          },
+        ],
+      },
+      {
+        title: "Catégories",
+        icon: IconTags,
+        url: "/dashboard/categories",
+        items: [
+          {
+            title: "Toutes",
+            url: "/dashboard/categories",
+          },
+          {
+            title: "Nouvelle",
+            url: "/dashboard/categories/new",
+          },
+        ],
+      },
+    ],
+    navSecondary: [
+      {
+        title: "Paramètres",
+        url: "/dashboard/settings",
+        icon: IconSettings,
+      },
+      {
+        title: "Déconnexion",
+        url: "/logout",
+        icon: IconLogout,
+      },
+    ],
+  }
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -158,9 +107,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+              <a href="/dashboard">
+                <IconFileText className="!size-5" />
+                <span className="text-base font-semibold">Mini Blog</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -168,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
+        <NavDocuments items={data.articles} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
