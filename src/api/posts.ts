@@ -43,6 +43,55 @@ export interface UpdatePostDto {
   categoryId?: string;
 }
 
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface PaginatedPostsResponse {
+  items: Post[];
+  meta: PaginationMeta;
+}
+
+/**
+ * Récupérer tous les posts avec pagination
+ */
+export const getPostsPaginated = async (
+  page: number = 1,
+  limit: number = 10,
+  search?: string
+): Promise<PaginatedPostsResponse> => {
+  try {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    
+    if (search) {
+      params.append('search', search);
+    }
+
+    const response = await fetch(buildUrl(`posts?${params.toString()}`), {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error("Erreur lors de la récupération des posts");
+    }
+
+    const result = await response.json();
+    return result.data || result;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Une erreur est survenue");
+  }
+};
+
 /**
  * Récupérer tous les posts
  */

@@ -42,6 +42,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -55,13 +63,13 @@ import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
-  getPosts,
+  getPostsPaginated,
   createPost,
   updatePost,
   deletePost,
 } from "@/api/posts";
 import { getCategories } from "@/api/categories";
-import type { Post } from "@/api/posts";
+import type { Post, PaginationMeta } from "@/api/posts";
 import type { Category } from "@/api/categories";
 import { toast } from "sonner";
 
@@ -96,18 +104,26 @@ export default function PostsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [paginationMeta, setPaginationMeta] = useState<PaginationMeta>({
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+  });
 
   // Charger les posts et catégories
-  const loadData = async () => {
+  const loadData = async (page: number = 1) => {
     try {
       setLoading(true);
-      const [postsData, categoriesData] = await Promise.all([
-        getPosts(),
+      const [postsResponse, categoriesData] = await Promise.all([
+        getPostsPaginated(page, 10),
         getCategories(),
       ]);
 
-      if (Array.isArray(postsData)) {
-        setPosts(postsData);
+      if (postsResponse && postsResponse.items) {
+        setPosts(postsResponse.items);
+        setPaginationMeta(postsResponse.meta);
       } else {
         setPosts([]);
       }
@@ -131,8 +147,8 @@ export default function PostsPage() {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData(currentPage);
+  }, [currentPage]);
 
   // Formulaire de création
   const createForm = useFormik({
@@ -160,7 +176,7 @@ export default function PostsPage() {
         });
         setCreateSheetOpen(false);
         resetForm();
-        loadData();
+        loadData(currentPage);
       } catch (error) {
         toast.error("Erreur", {
           description:
@@ -199,7 +215,7 @@ export default function PostsPage() {
         });
         setEditSheetOpen(false);
         setSelectedPost(null);
-        loadData();
+        loadData(currentPage);
       } catch (error) {
         toast.error("Erreur", {
           description:
@@ -235,7 +251,12 @@ export default function PostsPage() {
       });
       setDeleteDialogOpen(false);
       setDeletingId(null);
-      loadData();
+      // Si c'est le dernier post de la page et qu'on n'est pas sur la première page, revenir à la page précédente
+      if (posts.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      } else {
+        loadData(currentPage);
+      }
     } catch (error) {
       toast.error("Erreur", {
         description:
@@ -293,60 +314,109 @@ export default function PostsPage() {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {posts.map((post) => (
-                    <div
-                      key={post.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex items-center gap-4 flex-1">
-                        {post.image && (
-                          <img
-                            src={post.image}
-                            alt={post.title}
-                            className="h-16 w-16 rounded object-cover"
-                          />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold truncate">{post.title}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {post.category.name} • {post.views} vues
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span
-                              className={`text-xs px-2 py-1 rounded ${
-                                post.published
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-gray-100 text-gray-700"
-                              }`}
-                            >
-                              {post.published ? "Publié" : "Brouillon"}
-                            </span>
+                <>
+                  <div className="space-y-4">
+                    {posts.map((post) => (
+                      <div
+                        key={post.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-4 flex-1">
+                          {post.image && (
+                            <img
+                              src={post.image}
+                              alt={post.title}
+                              className="h-16 w-16 rounded object-cover"
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold truncate">{post.title}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {post.category.name} • {post.views} vues
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span
+                                className={`text-xs px-2 py-1 rounded ${
+                                  post.published
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-gray-100 text-gray-700"
+                                }`}
+                              >
+                                {post.published ? "Publié" : "Brouillon"}
+                              </span>
+                            </div>
                           </div>
                         </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(post)}
+                          >
+                            <IconEdit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setDeletingId(post.id);
+                              setDeleteDialogOpen(true);
+                            }}
+                          >
+                            <IconTrash className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEdit(post)}
-                        >
-                          <IconEdit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setDeletingId(post.id);
-                            setDeleteDialogOpen(true);
-                          }}
-                        >
-                          <IconTrash className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {paginationMeta.totalPages > 1 && (
+                  <div className="mt-6 flex justify-center">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                            className={
+                              currentPage === 1
+                                ? "pointer-events-none opacity-50"
+                                : "cursor-pointer"
+                            }
+                          />
+                        </PaginationItem>
+
+                        {Array.from({ length: paginationMeta.totalPages }, (_, i) => i + 1).map(
+                          (page) => (
+                            <PaginationItem key={page}>
+                              <PaginationLink
+                                onClick={() => setCurrentPage(page)}
+                                isActive={currentPage === page}
+                                className="cursor-pointer"
+                              >
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          )
+                        )}
+
+                        <PaginationItem>
+                          <PaginationNext
+                            onClick={() =>
+                              setCurrentPage((p) => Math.min(paginationMeta.totalPages, p + 1))
+                            }
+                            className={
+                              currentPage === paginationMeta.totalPages
+                                ? "pointer-events-none opacity-50"
+                                : "cursor-pointer"
+                            }
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
+                </>
               )}
             </CardContent>
           </Card>
