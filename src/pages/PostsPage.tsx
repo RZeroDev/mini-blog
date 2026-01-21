@@ -58,7 +58,7 @@ import {
 } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/rich-text-editor";
 import { ImageUpload } from "@/components/image-upload";
-import { IconPlus, IconEdit, IconTrash, IconPhoto } from "@tabler/icons-react";
+import { IconPlus, IconEdit, IconTrash, IconPhoto, IconFileText, IconEye } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -152,6 +152,10 @@ export default function PostsPage() {
   useEffect(() => {
     loadData(currentPage);
   }, [currentPage]);
+
+  // Calculer les statistiques
+  const publishedCount = posts.filter(post => post.published).length;
+  const draftCount = posts.filter(post => !post.published).length;
 
   // Formulaire de création
   const createForm = useFormik({
@@ -288,21 +292,82 @@ export default function PostsPage() {
           </Breadcrumb>
         </header>
 
-        <div className="flex flex-1 flex-col gap-4 p-4">
+        <div className="flex flex-1 flex-col gap-6 p-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Articles</h1>
+              <p className="text-muted-foreground">
+                Gérez tous vos articles de blog
+              </p>
+            </div>
+            <Button size="lg" className="gap-2" onClick={() => setCreateSheetOpen(true)}>
+              <IconPlus className="h-5 w-5" />
+              Nouvel article
+            </Button>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total d'articles
+                </CardTitle>
+                <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <IconFileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{paginationMeta.total}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Articles au total
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Publiés
+                </CardTitle>
+                <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                  <IconEye className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{publishedCount}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Articles visibles
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Brouillons
+                </CardTitle>
+                <div className="h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
+                  <IconEdit className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{draftCount}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Non publiés
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Articles List */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Gestion des Articles</CardTitle>
-                  <CardDescription>
-                    Créez, modifiez et supprimez vos articles
-                  </CardDescription>
-                </div>
-                <Button onClick={() => setCreateSheetOpen(true)}>
-                  <IconPlus className="mr-2 h-4 w-4" />
-                  Nouvel article
-                </Button>
-              </div>
+              <CardTitle>Liste des articles</CardTitle>
+              <CardDescription>
+                {paginationMeta.total} article{paginationMeta.total > 1 ? "s" : ""} au total
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -318,58 +383,100 @@ export default function PostsPage() {
                 </div>
               ) : (
                 <>
-                  <div className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {posts.map((post) => (
-                      <div
-                        key={post.id}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      <Card 
+                        key={post.id} 
+                        className="overflow-hidden hover:shadow-lg transition-all group"
                       >
-                        <div className="flex items-center gap-4 flex-1">
-                          {post.image && (
+                        {/* Image */}
+                        <div className="relative h-48 bg-muted overflow-hidden">
+                          {post.image ? (
                             <img
                               src={`${apiUrl}uploads/posts/${post.image}`}
                               alt={post.title}
-                              className="h-16 w-16 rounded object-cover"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold truncate">{post.title}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {post.category.name} {post.views ? `• ${post.views} vues` : ''}
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span
-                                className={`text-xs px-2 py-1 rounded ${
-                                  post.published
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-gray-100 text-gray-700"
-                                }`}
-                              >
-                                {post.published ? "Publié" : "Brouillon"}
-                              </span>
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+                              <IconPhoto className="h-16 w-16 text-muted-foreground/30" />
                             </div>
+                          )}
+                          {/* Status Badge */}
+                          <div className="absolute top-3 right-3">
+                            <span
+                              className={`text-xs px-3 py-1.5 rounded-full font-semibold shadow-lg backdrop-blur-sm ${
+                                post.published
+                                  ? "bg-green-500/90 text-white"
+                                  : "bg-gray-500/90 text-white"
+                              }`}
+                            >
+                              {post.published ? "Publié" : "Brouillon"}
+                            </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(post)}
-                          >
-                            <IconEdit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setDeletingId(post.id);
-                              setDeleteDialogOpen(true);
-                            }}
-                          >
-                            <IconTrash className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
+
+                        {/* Content */}
+                        <CardContent className="p-4">
+                          <div className="space-y-3">
+                            {/* Category */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
+                                {post.category.name}
+                              </span>
+                              {post.views && (
+                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <IconEye className="h-3 w-3" />
+                                  {post.views}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Title */}
+                            <h3 className="font-semibold text-base line-clamp-2 min-h-[3rem]">
+                              {post.title}
+                            </h3>
+
+                            {/* Content Preview */}
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {post.content.replace(/<[^>]*>/g, '').substring(0, 100)}...
+                            </p>
+
+                            {/* Date */}
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(post.createdAt).toLocaleDateString('fr-FR', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}
+                            </p>
+
+                            {/* Actions */}
+                            <div className="flex gap-2 pt-2 border-t">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="flex-1"
+                                onClick={() => handleEdit(post)}
+                              >
+                                <IconEdit className="h-4 w-4 mr-1" />
+                                Modifier
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200"
+                                onClick={() => {
+                                  setDeletingId(post.id);
+                                  setDeleteDialogOpen(true);
+                                }}
+                              >
+                                <IconTrash className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
 

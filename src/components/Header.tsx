@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   IconMenu2,
   IconX,
@@ -12,11 +12,15 @@ import type { Category } from "@/api/categories";
 import { apiUrl } from "@/api";
 
 export function Header() {
+  const location = useLocation();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  
+  const isActive = (path: string) => location.pathname === path;
+  const isCategoryPath = location.pathname.startsWith('/category') || location.pathname === '/categories';
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -38,9 +42,6 @@ export function Header() {
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="flex h-10 w-10 items-center justify-center bg-gradient-to-br from-primary to-primary/80 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
-              <span className="text-lg font-bold text-primary-foreground">MB</span>
-            </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
               Mini Blog
               </span>
@@ -50,10 +51,16 @@ export function Header() {
           <nav className="hidden md:flex items-center space-x-1">
             <Link
               to="/"
-              className="relative px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors rounded-lg hover:bg-muted group"
+              className={`relative px-4 py-2 text-sm font-medium transition-colors rounded-lg hover:bg-muted group ${
+                isActive('/') 
+                  ? 'text-primary font-semibold bg-primary/10' 
+                  : 'text-foreground/80 hover:text-foreground'
+              }`}
             >
               Accueil
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full" />
+              <span className={`absolute bottom-0 left-0 right-0 h-0.5 bg-primary transition-transform duration-300 rounded-full ${
+                isActive('/') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+              }`} />
             </Link>
 
             {/* Categories Dropdown */}
@@ -61,7 +68,11 @@ export function Header() {
               <button
                 onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
                 onBlur={() => setTimeout(() => setIsCategoriesOpen(false), 200)}
-                className="flex items-center px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors rounded-lg hover:bg-muted group"
+                className={`flex items-center px-4 py-2 text-sm font-medium transition-colors rounded-lg hover:bg-muted group ${
+                  isCategoryPath 
+                    ? 'text-primary font-semibold bg-primary/10' 
+                    : 'text-foreground/80 hover:text-foreground'
+                }`}
               >
                 Catégories
                 <IconChevronDown className={`ml-1 h-4 w-4 transition-transform duration-200 ${isCategoriesOpen ? 'rotate-180' : ''}`} />
@@ -112,18 +123,30 @@ export function Header() {
 
             <Link
               to="/about"
-              className="relative px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors rounded-lg hover:bg-muted group"
+              className={`relative px-4 py-2 text-sm font-medium transition-colors rounded-lg hover:bg-muted group ${
+                isActive('/about') 
+                  ? 'text-primary font-semibold bg-primary/10' 
+                  : 'text-foreground/80 hover:text-foreground'
+              }`}
             >
               À propos
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full" />
+              <span className={`absolute bottom-0 left-0 right-0 h-0.5 bg-primary transition-transform duration-300 rounded-full ${
+                isActive('/about') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+              }`} />
             </Link>
 
             <Link
               to="/contact"
-              className="relative px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors rounded-lg hover:bg-muted group"
+              className={`relative px-4 py-2 text-sm font-medium transition-colors rounded-lg hover:bg-muted group ${
+                isActive('/contact') 
+                  ? 'text-primary font-semibold bg-primary/10' 
+                  : 'text-foreground/80 hover:text-foreground'
+              }`}
             >
               Contact
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full" />
+              <span className={`absolute bottom-0 left-0 right-0 h-0.5 bg-primary transition-transform duration-300 rounded-full ${
+                isActive('/contact') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+              }`} />
             </Link>
           </nav>
 
@@ -206,7 +229,11 @@ export function Header() {
             <nav className="space-y-2 px-4">
               <Link
                 to="/"
-                className="block px-4 py-3 text-sm font-semibold text-foreground hover:bg-muted rounded-lg transition-colors"
+                className={`block px-4 py-3 text-sm font-semibold rounded-lg transition-colors ${
+                  isActive('/') 
+                    ? 'text-primary bg-primary/10' 
+                    : 'text-foreground hover:bg-muted'
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 Accueil
@@ -245,7 +272,11 @@ export function Header() {
 
               <Link
                 to="/about"
-                className="block px-4 py-3 text-sm font-semibold text-foreground hover:bg-muted rounded-lg transition-colors"
+                className={`block px-4 py-3 text-sm font-semibold rounded-lg transition-colors ${
+                  isActive('/about') 
+                    ? 'text-primary bg-primary/10' 
+                    : 'text-foreground hover:bg-muted'
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 À propos
@@ -253,7 +284,11 @@ export function Header() {
 
               <Link
                 to="/contact"
-                className="block px-4 py-3 text-sm font-semibold text-foreground hover:bg-muted rounded-lg transition-colors"
+                className={`block px-4 py-3 text-sm font-semibold rounded-lg transition-colors ${
+                  isActive('/contact') 
+                    ? 'text-primary bg-primary/10' 
+                    : 'text-foreground hover:bg-muted'
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact

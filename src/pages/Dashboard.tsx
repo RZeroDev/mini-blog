@@ -27,11 +27,14 @@ import {
   IconEye,
   IconTrendingUp,
   IconPlus,
+  IconArrowRight,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const { user } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
 
   return (
     <SidebarProvider>
@@ -64,7 +67,7 @@ export default function Dashboard() {
                   Voici un aperçu de votre blog
                 </p>
               </div>
-              <Button size="lg" className="gap-2">
+              <Button size="lg" className="gap-2" onClick={() => navigate('/dashboard/posts')}>
                 <IconPlus className="h-5 w-5" />
                 Nouvel article
               </Button>
@@ -74,12 +77,15 @@ export default function Dashboard() {
           {/* Stats Grid with Icons */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {/* Articles Card */}
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card 
+              className="hover:shadow-lg transition-all cursor-pointer hover:scale-105 group"
+              onClick={() => navigate('/dashboard/posts')}
+            >
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">
                   Articles
                 </CardTitle>
-                <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <IconArticle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
               </CardHeader>
@@ -88,20 +94,37 @@ export default function Dashboard() {
                 <p className="text-xs text-muted-foreground mt-1">
                   Articles publiés
                 </p>
-                <div className="flex items-center mt-2 text-xs text-green-600">
-                  <IconTrendingUp className="h-3 w-3 mr-1" />
-                  <span>+0% ce mois-ci</span>
+                <div className="flex items-center justify-between mt-3">
+                  <div className="flex items-center text-xs text-green-600">
+                    <IconTrendingUp className="h-3 w-3 mr-1" />
+                    <span>+0% ce mois-ci</span>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 text-xs gap-1 group-hover:text-primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate('/dashboard/posts');
+                    }}
+                  >
+                    Gérer
+                    <IconArrowRight className="h-3 w-3" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
 
             {/* Categories Card */}
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card 
+              className="hover:shadow-lg transition-all cursor-pointer hover:scale-105 group"
+              onClick={() => navigate('/dashboard/categories')}
+            >
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">
                   Catégories
                 </CardTitle>
-                <div className="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <IconTags className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
               </CardHeader>
@@ -110,8 +133,22 @@ export default function Dashboard() {
                 <p className="text-xs text-muted-foreground mt-1">
                   Catégories actives
                 </p>
-                <div className="flex items-center mt-2 text-xs text-muted-foreground">
-                  <span>Prêt pour l'organisation</span>
+                <div className="flex items-center justify-between mt-3">
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <span>Prêt pour l'organisation</span>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 text-xs gap-1 group-hover:text-primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate('/dashboard/categories');
+                    }}
+                  >
+                    Gérer
+                    <IconArrowRight className="h-3 w-3" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -154,10 +191,16 @@ export default function Dashboard() {
                 <p className="text-sm text-muted-foreground max-w-sm">
                   Commencez par créer votre premier article pour voir votre activité ici
                 </p>
-                <Button className="mt-4 gap-2">
-                  <IconPlus className="h-4 w-4" />
-                  Créer mon premier article
-                </Button>
+                <div className="flex gap-3 mt-4">
+                  <Button className="gap-2" onClick={() => navigate('/dashboard/posts')}>
+                    <IconPlus className="h-4 w-4" />
+                    Créer un article
+                  </Button>
+                  <Button variant="outline" className="gap-2" onClick={() => navigate('/dashboard/categories')}>
+                    <IconTags className="h-4 w-4" />
+                    Gérer les catégories
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

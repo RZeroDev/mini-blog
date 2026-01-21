@@ -42,7 +42,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUpload } from "@/components/image-upload";
-import { IconPlus, IconPhoto } from "@tabler/icons-react";
+import { IconPlus, IconPhoto, IconTags, IconFileText, IconFolder } from "@tabler/icons-react";
 import { CategoriesGrid } from "@/components/categories-grid";
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
@@ -74,6 +74,7 @@ export default function CategoriesPage() {
     null
   );
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [totalPosts, setTotalPosts] = useState(0);
 
   // Charger les catégories
   const loadCategories = async () => {
@@ -85,9 +86,13 @@ export default function CategoriesPage() {
       // S'assurer que c'est un tableau
       if (Array.isArray(data)) {
         setCategories(data);
+        // Calculer le nombre total de posts
+        const total = data.reduce((acc: number, cat: Category) => acc + (cat._count?.posts || 0), 0);
+        setTotalPosts(total);
       } else {
         console.error("Les données ne sont pas un tableau:", data);
         setCategories([]);
+        setTotalPosts(0);
       }
     } catch (error) {
       console.error("Erreur lors du chargement:", error);
@@ -96,6 +101,7 @@ export default function CategoriesPage() {
           error instanceof Error ? error.message : "Erreur de chargement",
       });
       setCategories([]);
+      setTotalPosts(0);
     } finally {
       setLoading(false);
     }
@@ -251,7 +257,63 @@ export default function CategoriesPage() {
             </Button>
           </div>
 
-          {/* Categories Table */}
+          {/* Stats Cards */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total de catégories
+                </CardTitle>
+                <div className="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                  <IconTags className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{categories.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Catégories actives
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Articles associés
+                </CardTitle>
+                <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <IconFileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{totalPosts}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Articles au total
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Moyenne par catégorie
+                </CardTitle>
+                <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                  <IconFolder className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">
+                  {categories.length > 0 ? Math.round(totalPosts / categories.length) : 0}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Articles par catégorie
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Categories Grid */}
           <Card>
             <CardHeader>
               <CardTitle>Liste des catégories</CardTitle>

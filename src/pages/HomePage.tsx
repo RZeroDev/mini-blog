@@ -200,7 +200,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Latest News Section */}
         <section className="mb-16">
           
@@ -593,34 +593,6 @@ const HomePage = () => {
           )}
         </section>
       </div>
-
-      {/* Newsletter Section */}
-      <section className="py-16 bg-card border-t border-border">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-4">
-            Restez informé
-          </h2>
-          <p className="text-xl text-muted-foreground mb-8">
-            Recevez les derniers articles directement dans votre boîte mail
-          </p>
-          <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Votre adresse email"
-              className="flex-1 px-4 py-3 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 text-base font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors"
-            >
-              S'abonner
-            </button>
-          </form>
-          <p className="text-sm text-muted-foreground mt-4">
-            Pas de spam, désabonnez-vous à tout moment
-          </p>
-        </div>
-      </section>
     </div>
   );
 };
