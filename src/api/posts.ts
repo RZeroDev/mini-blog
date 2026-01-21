@@ -366,11 +366,12 @@ export const deletePost = async (id: string): Promise<void> => {
 };
 
 /**
- * Récupérer les posts par catégorie
+ * Récupérer les posts par catégorie sans pagination (tous les posts)
  */
 export const getPostsByCategory = async (categoryId: string): Promise<Post[]> => {
   try {
-    const response = await fetch(buildUrl(`posts/category/${categoryId}`), {
+    // Utiliser limit=1000 pour récupérer tous les posts de la catégorie
+    const response = await fetch(buildUrl(`posts/category/${categoryId}?limit=1000`), {
       method: "GET",
     });
 
@@ -380,17 +381,75 @@ export const getPostsByCategory = async (categoryId: string): Promise<Post[]> =>
 
     const result = await response.json();
     
-    // Le backend retourne maintenant { data: [...], message: '...' } ou directement un tableau
+    // Le backend retourne maintenant { statusCode: 200, data: { items: [...], meta: {...} }, message: '...' }
+    if (result.data && result.data.items && Array.isArray(result.data.items)) {
+      return result.data.items.filter((post: Post) => post.published);
+    }
+    
+    // Fallback pour l'ancienne structure { data: [...] }
     if (result.data && Array.isArray(result.data)) {
       return result.data.filter((post: Post) => post.published);
     }
     
-    // Fallback pour l'ancienne structure
+    // Fallback pour un tableau direct
     if (Array.isArray(result)) {
       return result.filter((post: Post) => post.published);
     }
     
     return [];
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Une erreur est survenue");
+  }
+};
+
+/**
+ * Récupérer les posts par catégorie avec pagination
+ */
+export const getPostsByCategoryPaginated = async (
+  categoryId: string,
+  page: number = 1,
+  limit: number = 12
+): Promise<PaginatedPostsResponse> => {
+  try {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    const response = await fetch(buildUrl(`posts/category/${categoryId}?${params.toString()}`), {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error("Erreur lors de la récupération des posts");
+    }
+
+    const result = await response.json();
+    
+    // Le backend retourne { statusCode: 200, data: { items: [...], meta: {...} }, message: '...' }
+    if (result.data && result.data.items && Array.isArray(result.data.items) && result.data.meta) {
+      return {
+        items: result.data.items.filter((post: Post) => post.published),
+        meta: result.data.meta,
+      };
+    }
+    
+    // Fallback pour l'ancienne structure
+    if (result.data && Array.isArray(result.data) && result.meta) {
+      return {
+        items: result.data.filter((post: Post) => post.published),
+        meta: result.meta,
+      };
+    }
+    
+    // Fallback
+    return { 
+      items: [], 
+      meta: { total: 0, page: 1, limit: 12, totalPages: 1 } 
+    };
   } catch (error) {
     if (error instanceof Error) {
       throw error;

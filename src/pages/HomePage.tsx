@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BlogHeader } from "@/components/blog-header";
 import { IconFolder, IconClock, IconBookmark, IconHeart } from "@tabler/icons-react";
-import { getRecentPosts, getPosts, getPostsByCategory } from "@/api/posts";
+import { getRecentPosts, getPostsPaginated, getPostsByCategoryPaginated } from "@/api/posts";
 import { getCategories } from "@/api/categories";
 import { apiUrl } from "@/api";
 import type { Post } from "@/api/posts";
@@ -10,32 +10,30 @@ import type { Category } from "@/api/categories";
 
 const HomePage = () => {
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
-  const [allPosts, setAllPosts] = useState<Post[]>([]);
-  const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [displayedPosts, setDisplayedPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingCategory, setIsLoadingCategory] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [postsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalPosts, setTotalPosts] = useState(0);
 
   // Charger les données initiales
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [postsData, allPostsData, categoriesData] = await Promise.all([
+        const [postsData, categoriesData] = await Promise.all([
           getRecentPosts(6),
-          getPosts(true),
           getCategories(),
         ]);
         console.log("Posts récupérés:", postsData);
-        console.log("Tous les posts:", allPostsData);
         setRecentPosts(postsData);
-        setAllPosts(allPostsData);
-        setFilteredPosts(allPostsData);
-        setCategories(categoriesData.slice(0, 8));
+        const limitedCategories = categoriesData.slice(0, 8);
+        setCategories(limitedCategories);
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
       } finally {
@@ -49,50 +47,72 @@ const HomePage = () => {
   // Charger les posts par catégorie quand la catégorie change
   useEffect(() => {
     const fetchPostsByCategory = async () => {
-      if (selectedCategory === "all") {
-        console.log("Chargement de tous les posts, nombre:", allPosts.length);
-        // Ne rien faire si on est encore en train de charger initialement
-        if (isLoading) {
-          console.log("Chargement initial en cours, attente...");
-          return;
-        }
-        console.log("Affichage de tous les posts:", allPosts.length);
-        setFilteredPosts(allPosts);
-        setCurrentPage(1);
+      if (!selectedCategory) {
         return;
       }
 
       try {
-        setIsLoadingCategory(true);
-        const categoryPosts = await getPostsByCategory(selectedCategory);
-        console.log(`Posts de la catégorie ${selectedCategory}:`, categoryPosts);
-        setFilteredPosts(categoryPosts);
+        setIsLoadingPosts(true);
+        setDisplayedPosts([]); // Réinitialiser les posts affichés
         setCurrentPage(1);
+        
+        let result;
+        // Si "Toutes les catégories" est sélectionné, charger tous les posts
+        if (selectedCategory === "all") {
+          console.log("Chargement de tous les posts avec pagination");
+          result = await getPostsPaginated(1, postsPerPage);
+        } else {
+          // Sinon, charger les posts de la catégorie spécifique
+          console.log(`Chargement des posts de la catégorie ${selectedCategory}`);
+          result = await getPostsByCategoryPaginated(selectedCategory, 1, postsPerPage);
+        }
+        
+        console.log("Résultat pagination:", result);
+        setDisplayedPosts(result.items);
+        setTotalPages(result.meta.totalPages);
+        setTotalPosts(result.meta.total);
       } catch (error) {
-        console.error("Erreur lors du chargement des posts par catégorie:", error);
-        setFilteredPosts([]);
+        console.error("Erreur lors du chargement des posts:", error);
+        setDisplayedPosts([]);
+        setTotalPages(1);
+        setTotalPosts(0);
       } finally {
-        setIsLoadingCategory(false);
+        setIsLoadingPosts(false);
       }
     };
 
     fetchPostsByCategory();
-  }, [selectedCategory, allPosts, isLoading]);
+  }, [selectedCategory, postsPerPage]);
 
-  // Mettre à jour les posts affichés selon la pagination
-  useEffect(() => {
-    const startIndex = 0;
-    const endIndex = currentPage * postsPerPage;
-    setDisplayedPosts(filteredPosts.slice(startIndex, endIndex));
-  }, [filteredPosts, currentPage, postsPerPage]);
+  // Fonction pour charger plus de posts (pagination serveur)
+  const loadMorePosts = async () => {
+    if (isLoadingMore || currentPage >= totalPages) {
+      return;
+    }
 
-  // Fonction pour charger plus de posts
-  const loadMorePosts = () => {
-    setCurrentPage(prev => prev + 1);
+    try {
+      setIsLoadingMore(true);
+      const nextPage = currentPage + 1;
+      
+      let result;
+      if (selectedCategory === "all") {
+        result = await getPostsPaginated(nextPage, postsPerPage);
+      } else {
+        result = await getPostsByCategoryPaginated(selectedCategory, nextPage, postsPerPage);
+      }
+      
+      // Ajouter les nouveaux posts aux posts existants
+      setDisplayedPosts(prev => [...prev, ...result.items]);
+      setCurrentPage(nextPage);
+    } catch (error) {
+      console.error("Erreur lors du chargement de plus de posts:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
   };
 
   // Vérifier s'il y a plus de posts à charger
-  const hasMorePosts = displayedPosts.length < filteredPosts.length;
+  const hasMorePosts = currentPage < totalPages;
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString("fr-FR", {
@@ -324,8 +344,8 @@ const HomePage = () => {
             ))}
           </div>
 
-          {/* Filtered Articles - Grid Layout avec cartes aléatoires */}
-          {(isLoading || isLoadingCategory) ? (
+          {/* Filtered Articles - Masonry Layout avec cartes aléatoires */}
+          {(isLoading || isLoadingPosts) ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(9)].map((_, i) => (
                 <div key={i} className="h-80 bg-muted rounded-lg animate-pulse" />
@@ -560,13 +580,27 @@ const HomePage = () => {
               
               {/* Bouton Charger Plus */}
               {hasMorePosts && (
-                <div className="flex justify-center mt-12">
+                <div className="flex flex-col items-center gap-4 mt-12">
                   <button
                     onClick={loadMorePosts}
-                    className="px-8 py-4 text-base font-semibold text-white bg-primary hover:bg-primary/90 rounded-xl transition-all hover:shadow-lg transform hover:scale-105"
+                    disabled={isLoadingMore}
+                    className="px-8 py-4 text-base font-semibold text-white bg-primary hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-xl transition-all hover:shadow-lg transform hover:scale-105 disabled:transform-none"
                   >
-                    Charger plus d'articles ({filteredPosts.length - displayedPosts.length} restants)
+                    {isLoadingMore ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Chargement...
+                      </span>
+                    ) : (
+                      `Charger plus d'articles (${totalPosts - displayedPosts.length} restants)`
+                    )}
                   </button>
+                  <p className="text-sm text-muted-foreground">
+                    Page {currentPage} sur {totalPages} • {displayedPosts.length} / {totalPosts} articles
+                  </p>
                 </div>
               )}
             </>
