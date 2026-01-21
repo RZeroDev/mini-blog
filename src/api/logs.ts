@@ -1,4 +1,4 @@
-import api from './index';
+import { buildUrl, getAuthHeaders } from './index';
 
 export interface Log {
   id: string;
@@ -34,8 +34,19 @@ export const getLogs = async (
   page: number = 1,
   limit: number = 20
 ): Promise<PaginatedLogsResponse> => {
-  const response = await api.get(`/logs?page=${page}&limit=${limit}`);
-  return response.data;
+  const response = await fetch(
+    buildUrl(`logs?page=${page}&limit=${limit}`),
+    {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des logs');
+  }
+
+  return response.json();
 };
 
 /**
@@ -46,10 +57,19 @@ export const getLogsByAction = async (
   page: number = 1,
   limit: number = 20
 ): Promise<PaginatedLogsResponse> => {
-  const response = await api.get(
-    `/logs/action/${action}?page=${page}&limit=${limit}`
+  const response = await fetch(
+    buildUrl(`logs/action/${action}?page=${page}&limit=${limit}`),
+    {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    }
   );
-  return response.data;
+
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des logs');
+  }
+
+  return response.json();
 };
 
 /**
@@ -60,16 +80,36 @@ export const getLogsByUser = async (
   page: number = 1,
   limit: number = 20
 ): Promise<PaginatedLogsResponse> => {
-  const response = await api.get(
-    `/logs/user/${userId}?page=${page}&limit=${limit}`
+  const response = await fetch(
+    buildUrl(`logs/user/${userId}?page=${page}&limit=${limit}`),
+    {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    }
   );
-  return response.data;
+
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des logs');
+  }
+
+  return response.json();
 };
 
 /**
  * Nettoyer les anciens logs
  */
 export const cleanupOldLogs = async (days: number = 90): Promise<any> => {
-  const response = await api.delete(`/logs/cleanup?days=${days}`);
-  return response.data;
+  const response = await fetch(
+    buildUrl(`logs/cleanup?days=${days}`),
+    {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Erreur lors du nettoyage des logs');
+  }
+
+  return response.json();
 };

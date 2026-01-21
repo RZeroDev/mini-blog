@@ -8,6 +8,9 @@ export interface Category {
   image: string;
   createdAt: string;
   updatedAt: string;
+  _count?: {
+    posts: number;
+  };
 }
 
 export interface CreateCategoryDto {

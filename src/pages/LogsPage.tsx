@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getLogs, getLogsByAction, Log, cleanupOldLogs } from '../api/logs';
+import { getLogs, getLogsByAction, cleanupOldLogs } from '../api/logs';
+import type { Log } from '../api/logs';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import {
