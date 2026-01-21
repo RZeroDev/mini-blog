@@ -1,6 +1,21 @@
 import { useEffect, useState } from 'react';
 import { getLogs, getLogsByAction, cleanupOldLogs } from '../api/logs';
 import type { Log } from '../api/logs';
+import { AppSidebar } from '@/components/app-sidebar';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import {
@@ -125,36 +140,54 @@ const LogsPage = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* En-tête */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Logs système</h1>
-          <p className="text-muted-foreground mt-1">
-            Historique des actions effectuées sur la plateforme
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => fetchLogs(currentPage, selectedAction)}
-            disabled={loading}
-          >
-            <IconRefresh className="h-4 w-4 mr-2" />
-            Actualiser
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleCleanup}
-            disabled={isCleaningUp}
-          >
-            <IconTrash className="h-4 w-4 mr-2" />
-            Nettoyer
-          </Button>
-        </div>
-      </div>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="mr-2 h-4" />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Logs système</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </header>
+        <div className="flex flex-1 flex-col gap-6 p-6">
+          {/* En-tête */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Logs système</h1>
+              <p className="text-muted-foreground mt-1">
+                Historique des actions effectuées sur la plateforme
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchLogs(currentPage, selectedAction)}
+                disabled={loading}
+              >
+                <IconRefresh className="h-4 w-4 mr-2" />
+                Actualiser
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleCleanup}
+                disabled={isCleaningUp}
+              >
+                <IconTrash className="h-4 w-4 mr-2" />
+                Nettoyer
+              </Button>
+            </div>
+          </div>
 
       {/* Statistiques */}
       <div className="grid gap-4 md:grid-cols-3">
@@ -320,7 +353,9 @@ const LogsPage = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
 
