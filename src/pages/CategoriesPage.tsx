@@ -22,14 +22,13 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,7 +41,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { IconPlus, IconEdit, IconTrash, IconPhoto } from "@tabler/icons-react";
+import { ImageUpload } from "@/components/image-upload";
+import { IconPlus, IconPhoto } from "@tabler/icons-react";
 import { CategoriesGrid } from "@/components/categories-grid";
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
@@ -67,14 +67,13 @@ const categorySchema = Yup.object({
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [createSheetOpen, setCreateSheetOpen] = useState(false);
+  const [editSheetOpen, setEditSheetOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
 
   // Charger les catégories
   const loadCategories = async () => {
@@ -126,9 +125,8 @@ export default function CategoriesPage() {
           description: "Catégorie créée avec succès",
         });
 
-        setCreateDialogOpen(false);
+        setCreateSheetOpen(false);
         resetForm();
-        setImagePreview("");
         loadCategories();
       } catch (error) {
         toast.error("Erreur", {
@@ -163,9 +161,8 @@ export default function CategoriesPage() {
           description: "Catégorie modifiée avec succès",
         });
 
-        setEditDialogOpen(false);
+        setEditSheetOpen(false);
         setSelectedCategory(null);
-        setImagePreview("");
         loadCategories();
       } catch (error) {
         toast.error("Erreur", {
@@ -176,31 +173,14 @@ export default function CategoriesPage() {
     },
   });
 
-  // Gérer la sélection d'image
-  const handleImageChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    formik: typeof createForm | typeof editForm
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      formik.setFieldValue("image", file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Ouvrir le dialog de modification
+  // Ouvrir le sheet de modification
   const handleEdit = (category: Category) => {
     setSelectedCategory(category);
     editForm.setValues({
       name: category.name,
       image: null,
     });
-    setImagePreview(`http://localhost:4000/${category.image}`);
-    setEditDialogOpen(true);
+    setEditSheetOpen(true);
   };
 
   // Gérer la demande de suppression
@@ -265,84 +245,10 @@ export default function CategoriesPage() {
               </p>
             </div>
 
-            {/* Create Dialog */}
-            <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="lg" className="gap-2">
-                  <IconPlus className="h-5 w-5" />
-                  Nouvelle catégorie
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <form onSubmit={createForm.handleSubmit}>
-                  <DialogHeader>
-                    <DialogTitle>Créer une catégorie</DialogTitle>
-                    <DialogDescription>
-                      Ajoutez une nouvelle catégorie pour organiser vos articles
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="create-name">Nom de la catégorie</Label>
-                      <Input
-                        id="create-name"
-                        name="name"
-                        placeholder="Ex: Technologies"
-                        value={createForm.values.name}
-                        onChange={createForm.handleChange}
-                        onBlur={createForm.handleBlur}
-                      />
-                      {createForm.touched.name && createForm.errors.name && (
-                        <p className="text-sm text-red-500">
-                          {createForm.errors.name}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label htmlFor="create-image">Image</Label>
-                      <Input
-                        id="create-image"
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleImageChange(e, createForm)}
-                        onBlur={createForm.handleBlur}
-                      />
-                      {createForm.touched.image && createForm.errors.image && (
-                        <p className="text-sm text-red-500">
-                          {String(createForm.errors.image)}
-                        </p>
-                      )}
-                      {imagePreview && (
-                        <div className="mt-2 flex justify-center">
-                          <img
-                            src={imagePreview}
-                            alt="Preview"
-                            className="h-32 w-32 rounded-lg object-cover"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setCreateDialogOpen(false);
-                        createForm.resetForm();
-                        setImagePreview("");
-                      }}
-                    >
-                      Annuler
-                    </Button>
-                    <Button type="submit" disabled={createForm.isSubmitting}>
-                      {createForm.isSubmitting ? "Création..." : "Créer"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <Button size="lg" className="gap-2" onClick={() => setCreateSheetOpen(true)}>
+              <IconPlus className="h-5 w-5" />
+              Nouvelle catégorie
+            </Button>
           </div>
 
           {/* Categories Table */}
@@ -356,9 +262,19 @@ export default function CategoriesPage() {
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-16 bg-muted rounded animate-pulse" />
+                <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <Card key={i} className="overflow-hidden">
+                      <div className="h-48 bg-muted animate-pulse" />
+                      <CardContent className="p-4 space-y-3">
+                        <div className="h-4 bg-muted rounded animate-pulse w-3/4" />
+                        <div className="h-3 bg-muted rounded animate-pulse w-1/2" />
+                        <div className="flex gap-2 pt-2">
+                          <div className="h-9 bg-muted rounded animate-pulse flex-1" />
+                          <div className="h-9 bg-muted rounded animate-pulse flex-1" />
+                        </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               ) : !Array.isArray(categories) || categories.length === 0 ? (
@@ -370,7 +286,7 @@ export default function CategoriesPage() {
                   <p className="text-sm text-muted-foreground mb-4">
                     Commencez par créer votre première catégorie
                   </p>
-                  <Button onClick={() => setCreateDialogOpen(true)}>
+                  <Button onClick={() => setCreateSheetOpen(true)}>
                     <IconPlus className="h-4 w-4 mr-2" />
                     Créer une catégorie
                   </Button>
@@ -386,60 +302,107 @@ export default function CategoriesPage() {
             </CardContent>
           </Card>
 
-          {/* Edit Dialog */}
-          <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-            <DialogContent className="sm:max-w-[500px]">
-              <form onSubmit={editForm.handleSubmit}>
-                <DialogHeader>
-                  <DialogTitle>Modifier la catégorie</DialogTitle>
-                  <DialogDescription>
-                    Modifiez les informations de la catégorie
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="edit-name">Nom de la catégorie</Label>
-                    <Input
-                      id="edit-name"
-                      name="name"
-                      value={editForm.values.name}
-                      onChange={editForm.handleChange}
-                      onBlur={editForm.handleBlur}
-                    />
-                    {editForm.touched.name && editForm.errors.name && (
-                      <p className="text-sm text-red-500">
-                        {editForm.errors.name}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="edit-image">Image (optionnel)</Label>
-                    <Input
-                      id="edit-image"
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageChange(e, editForm)}
-                    />
-                    {imagePreview && (
-                      <div className="mt-2 flex justify-center">
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="h-32 w-32 rounded-lg object-cover"
-                        />
-                      </div>
-                    )}
-                  </div>
+          {/* Sheet de création */}
+          <Sheet open={createSheetOpen} onOpenChange={setCreateSheetOpen}>
+            <SheetContent side="right" className="w-full overflow-y-auto px-4">
+              <SheetHeader>
+                <SheetTitle>Créer une catégorie</SheetTitle>
+                <SheetDescription>
+                  Ajoutez une nouvelle catégorie pour organiser vos articles
+                </SheetDescription>
+              </SheetHeader>
+              <form onSubmit={createForm.handleSubmit} className="space-y-6 mt-6">
+                <div className="space-y-2">
+                  <Label htmlFor="create-name">Nom de la catégorie *</Label>
+                  <Input
+                    id="create-name"
+                    name="name"
+                    placeholder="Ex: Technologies"
+                    value={createForm.values.name}
+                    onChange={createForm.handleChange}
+                    onBlur={createForm.handleBlur}
+                  />
+                  {createForm.touched.name && createForm.errors.name && (
+                    <p className="text-sm text-red-500">
+                      {createForm.errors.name}
+                    </p>
+                  )}
                 </div>
-                <DialogFooter>
+
+                <div className="space-y-2">
+                  <Label>Image *</Label>
+                  <ImageUpload
+                    onChange={(file) => createForm.setFieldValue("image", file)}
+                    placeholder="Ajouter une image"
+                  />
+                  {createForm.touched.image && createForm.errors.image && (
+                    <p className="text-sm text-red-500">
+                      {String(createForm.errors.image)}
+                    </p>
+                  )}
+                </div>
+
+                <SheetFooter>
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => {
-                      setEditDialogOpen(false);
+                      setCreateSheetOpen(false);
+                      createForm.resetForm();
+                    }}
+                  >
+                    Annuler
+                  </Button>
+                  <Button type="submit" disabled={createForm.isSubmitting}>
+                    {createForm.isSubmitting ? "Création..." : "Créer"}
+                  </Button>
+                </SheetFooter>
+              </form>
+            </SheetContent>
+          </Sheet>
+
+          {/* Sheet d'édition */}
+          <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
+            <SheetContent side="right" className="w-full overflow-y-auto px-4">
+              <SheetHeader>
+                <SheetTitle>Modifier la catégorie</SheetTitle>
+                <SheetDescription>
+                  Modifiez les informations de la catégorie
+                </SheetDescription>
+              </SheetHeader>
+              <form onSubmit={editForm.handleSubmit} className="space-y-6 mt-6">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-name">Nom de la catégorie</Label>
+                  <Input
+                    id="edit-name"
+                    name="name"
+                    value={editForm.values.name}
+                    onChange={editForm.handleChange}
+                    onBlur={editForm.handleBlur}
+                  />
+                  {editForm.touched.name && editForm.errors.name && (
+                    <p className="text-sm text-red-500">
+                      {editForm.errors.name}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Image (optionnel)</Label>
+                  <ImageUpload
+                    value={selectedCategory?.image ? `http://localhost:4000/${selectedCategory.image}` : undefined}
+                    onChange={(file) => editForm.setFieldValue("image", file)}
+                    placeholder="Changer l'image"
+                  />
+                </div>
+
+                <SheetFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setEditSheetOpen(false);
                       setSelectedCategory(null);
-                      setImagePreview("");
                     }}
                   >
                     Annuler
@@ -447,10 +410,10 @@ export default function CategoriesPage() {
                   <Button type="submit" disabled={editForm.isSubmitting}>
                     {editForm.isSubmitting ? "Modification..." : "Modifier"}
                   </Button>
-                </DialogFooter>
+                </SheetFooter>
               </form>
-            </DialogContent>
-          </Dialog>
+            </SheetContent>
+          </Sheet>
 
           {/* Delete AlertDialog */}
           <AlertDialog

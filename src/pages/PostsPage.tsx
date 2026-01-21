@@ -49,6 +49,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/rich-text-editor";
+import { ImageUpload } from "@/components/image-upload";
 import { IconPlus, IconEdit, IconTrash, IconPhoto } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
@@ -95,7 +96,6 @@ export default function PostsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
 
   // Charger les posts et catégories
   const loadData = async () => {
@@ -160,7 +160,6 @@ export default function PostsPage() {
         });
         setCreateSheetOpen(false);
         resetForm();
-        setImagePreview("");
         loadData();
       } catch (error) {
         toast.error("Erreur", {
@@ -200,7 +199,6 @@ export default function PostsPage() {
         });
         setEditSheetOpen(false);
         setSelectedPost(null);
-        setImagePreview("");
         loadData();
       } catch (error) {
         toast.error("Erreur", {
@@ -213,22 +211,6 @@ export default function PostsPage() {
     },
   });
 
-  // Gestion de l'image
-  const handleImageChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    form: typeof createForm | typeof editForm
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      form.setFieldValue("image", file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   // Ouvrir le sheet d'édition
   const handleEdit = (post: Post) => {
     setSelectedPost(post);
@@ -239,7 +221,6 @@ export default function PostsPage() {
       published: post.published,
       image: null,
     });
-    setImagePreview(post.image || "");
     setEditSheetOpen(true);
   };
 
@@ -373,7 +354,7 @@ export default function PostsPage() {
 
         {/* Sheet de création */}
         <Sheet open={createSheetOpen} onOpenChange={setCreateSheetOpen}>
-          <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+          <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto px-4">
             <SheetHeader>
               <SheetTitle>Créer un article</SheetTitle>
               <SheetDescription>
@@ -444,22 +425,11 @@ export default function PostsPage() {
 
               {/* Image */}
               <div className="space-y-2">
-                <Label htmlFor="create-image">Image (optionnel)</Label>
-                <div className="flex items-center gap-4">
-                  <Input
-                    id="create-image"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageChange(e, createForm)}
-                  />
-                  {imagePreview && (
-                    <img
-                      src={imagePreview}
-                      alt="Aperçu"
-                      className="h-16 w-16 rounded object-cover"
-                    />
-                  )}
-                </div>
+                <Label>Image (optionnel)</Label>
+                <ImageUpload
+                  onChange={(file) => createForm.setFieldValue("image", file)}
+                  placeholder="Ajouter une image"
+                />
               </div>
 
               {/* Publié */}
@@ -485,7 +455,6 @@ export default function PostsPage() {
                   onClick={() => {
                     setCreateSheetOpen(false);
                     createForm.resetForm();
-                    setImagePreview("");
                   }}
                 >
                   Annuler
@@ -500,7 +469,7 @@ export default function PostsPage() {
 
         {/* Sheet d'édition */}
         <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
-          <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+          <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto px-4">
             <SheetHeader>
               <SheetTitle>Modifier l'article</SheetTitle>
               <SheetDescription>
@@ -559,22 +528,12 @@ export default function PostsPage() {
 
               {/* Image */}
               <div className="space-y-2">
-                <Label htmlFor="edit-image">Nouvelle image (optionnel)</Label>
-                <div className="flex items-center gap-4">
-                  <Input
-                    id="edit-image"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageChange(e, editForm)}
-                  />
-                  {imagePreview && (
-                    <img
-                      src={imagePreview}
-                      alt="Aperçu"
-                      className="h-16 w-16 rounded object-cover"
-                    />
-                  )}
-                </div>
+                <Label>Nouvelle image (optionnel)</Label>
+                <ImageUpload
+                  value={selectedPost?.image}
+                  onChange={(file) => editForm.setFieldValue("image", file)}
+                  placeholder="Changer l'image"
+                />
               </div>
 
               {/* Publié */}
@@ -600,7 +559,6 @@ export default function PostsPage() {
                   onClick={() => {
                     setEditSheetOpen(false);
                     setSelectedPost(null);
-                    setImagePreview("");
                   }}
                 >
                   Annuler
