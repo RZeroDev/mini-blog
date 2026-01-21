@@ -82,10 +82,6 @@ const PostDetailPage = () => {
                 {post.title}
               </h1>
 
-              {post.excerpt && (
-                <p className="text-xl text-gray-600 mb-6">{post.excerpt}</p>
-              )}
-
               <div className="flex flex-wrap items-center gap-4 text-gray-600">
                 <div className="flex items-center gap-2">
                   <IconUser className="h-5 w-5" />

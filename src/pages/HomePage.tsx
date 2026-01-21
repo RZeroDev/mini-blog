@@ -189,14 +189,9 @@ const HomePage = () => {
                         {post.category.name}
                       </span>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-gray-700 transition-colors line-clamp-2">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-gray-700 transition-colors line-clamp-2">
                       {post.title}
                     </h3>
-                    {post.excerpt && (
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                        {post.excerpt}
-                      </p>
-                    )}
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <div className="flex items-center gap-1">
                         <IconClock className="h-4 w-4" />

@@ -3,6 +3,7 @@ import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import Dashboard from "./pages/Dashboard";
 import CategoriesPage from "./pages/CategoriesPage";
+import PostsPage from "./pages/PostsPage";
 import CategoryPage from "./pages/CategoryPage";
 import AllCategoriesPage from "./pages/AllCategoriesPage";
 import PostDetailPage from "./pages/PostDetailPage";
@@ -52,6 +53,16 @@ const App = () => {
             element={
               <PrivateRoute>
                 <CategoriesPage />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Route Articles (protégée) */}
+          <Route
+            path="/dashboard/posts"
+            element={
+              <PrivateRoute>
+                <PostsPage />
               </PrivateRoute>
             }
           />

@@ -43,7 +43,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { IconPlus, IconEdit, IconTrash, IconPhoto } from "@tabler/icons-react";
-import { CategoriesTable } from "@/components/categories-table";
+import { CategoriesGrid } from "@/components/categories-grid";
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -73,6 +73,7 @@ export default function CategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
 
   // Charger les catégories
@@ -202,10 +203,19 @@ export default function CategoriesPage() {
     setEditDialogOpen(true);
   };
 
+  // Gérer la demande de suppression
+  const handleDeleteRequest = (category: Category) => {
+    setSelectedCategory(category);
+    setDeleteDialogOpen(true);
+  };
+
   // Supprimer une catégorie
   const handleDelete = async () => {
     try {
       if (!selectedCategory) return;
+
+      setDeletingId(selectedCategory.id);
+      setDeleteDialogOpen(false);
 
       await deleteCategory(selectedCategory.id);
 
@@ -213,7 +223,6 @@ export default function CategoriesPage() {
         description: "Catégorie supprimée avec succès",
       });
 
-      setDeleteDialogOpen(false);
       setSelectedCategory(null);
       loadCategories();
     } catch (error) {
@@ -221,6 +230,8 @@ export default function CategoriesPage() {
         description:
           error instanceof Error ? error.message : "Erreur de suppression",
       });
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -365,13 +376,11 @@ export default function CategoriesPage() {
                   </Button>
                 </div>
               ) : (
-                <CategoriesTable
+                <CategoriesGrid
                   categories={categories}
                   onEdit={handleEdit}
-                  onDelete={(category) => {
-                    setSelectedCategory(category);
-                    setDeleteDialogOpen(true);
-                  }}
+                  onDelete={handleDeleteRequest}
+                  deletingId={deletingId}
                 />
               )}
             </CardContent>

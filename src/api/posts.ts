@@ -6,7 +6,6 @@ export interface Post {
   title: string;
   slug: string;
   content: string;
-  excerpt?: string;
   image?: string;
   published: boolean;
   views: number;
@@ -31,7 +30,6 @@ export interface Post {
 export interface CreatePostDto {
   title: string;
   content: string;
-  excerpt?: string;
   image?: File;
   published?: boolean;
   categoryId: string;
@@ -40,7 +38,6 @@ export interface CreatePostDto {
 export interface UpdatePostDto {
   title?: string;
   content?: string;
-  excerpt?: string;
   image?: File;
   published?: boolean;
   categoryId?: string;
@@ -175,9 +172,6 @@ export const createPost = async (postData: CreatePostDto): Promise<Post> => {
     const formData = new FormData();
     formData.append("title", postData.title);
     formData.append("content", postData.content);
-    if (postData.excerpt) {
-      formData.append("excerpt", postData.excerpt);
-    }
     if (postData.image) {
       formData.append("image", postData.image);
     }
@@ -222,9 +216,6 @@ export const updatePost = async (
     }
     if (postData.content) {
       formData.append("content", postData.content);
-    }
-    if (postData.excerpt) {
-      formData.append("excerpt", postData.excerpt);
     }
     if (postData.image) {
       formData.append("image", postData.image);

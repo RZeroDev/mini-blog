@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/pagination";
 import { IconEdit, IconTrash, IconSearch, IconLoader } from "@tabler/icons-react";
 import type { Category } from "@/api/categories";
+import { apiUrl } from "@/api";
 
 interface CategoriesGridProps {
   categories: Category[];
@@ -93,7 +94,7 @@ export function CategoriesGrid({
         </div>
       ) : (
         <>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
             {currentCategories.map((category) => (
               <Card
                 key={category.id}
@@ -102,7 +103,7 @@ export function CategoriesGrid({
                 {/* Image */}
                 <div className="relative h-48 bg-muted overflow-hidden">
                   <img
-                    src={`http://localhost:4000/${category.image}`}
+                    src={`${apiUrl}${category.image}`}
                     alt={category.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
