@@ -39,15 +39,7 @@ const ContactPage = () => {
 
       {/* Hero Section */}
       <section className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <Link
-            to="/"
-            className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 mb-6"
-          >
-            <IconArrowLeft className="mr-2 h-4 w-4" />
-            Retour à l'accueil
-          </Link>
-
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Contactez-nous
           </h1>
@@ -59,7 +51,7 @@ const ContactPage = () => {
 
       {/* Content */}
       <section className="py-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Contact Info */}
             <div className="space-y-6">
@@ -183,7 +175,7 @@ const ContactPage = () => {
 
                   <button
                     type="submit"
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3 text-base font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-6 py-3 text-base font-medium text-white bg-primary hover:bg-primary/80 rounded-lg transition-colors"
                   >
                     <IconSend className="h-5 w-5" />
                     Envoyer le message
@@ -191,41 +183,6 @@ const ContactPage = () => {
                 </form>
               </div>
 
-              {/* FAQ */}
-              <div className="bg-white border border-gray-200 rounded-lg p-8 mt-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">
-                  Questions fréquentes
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">
-                      Comment créer un compte ?
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      Cliquez sur "Se connecter" en haut de la page et suivez
-                      les instructions.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">
-                      Comment publier un article ?
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      Accédez à votre tableau de bord et cliquez sur "Nouvel
-                      article".
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">
-                      Puis-je modifier mes articles ?
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      Oui, vous pouvez modifier vos articles à tout moment
-                      depuis votre tableau de bord.
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

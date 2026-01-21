@@ -26,24 +26,24 @@ const AllCategoriesPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <BlogHeader />
 
       {/* Header */}
-      <section className="bg-white border-b border-gray-200">
+      <section className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <Link
             to="/"
-            className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 mb-6"
+            className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-6 transition-colors"
           >
             <IconArrowLeft className="mr-2 h-4 w-4" />
             Retour à l'accueil
           </Link>
 
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl font-bold text-foreground mb-2">
             Toutes les catégories
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Explorez tous les sujets disponibles
           </p>
         </div>
@@ -57,7 +57,7 @@ const AllCategoriesPage = () => {
               {[...Array(12)].map((_, i) => (
                 <div
                   key={i}
-                  className="h-40 bg-gray-200 rounded-lg animate-pulse"
+                  className="h-40 bg-muted rounded-lg animate-pulse"
                 />
               ))}
             </div>
@@ -67,7 +67,7 @@ const AllCategoriesPage = () => {
                 <Link
                   key={category.id}
                   to={`/category/${category.slug}`}
-                  className="group relative overflow-hidden rounded-lg border border-gray-200 hover:border-gray-900 transition-all hover:shadow-lg"
+                  className="group relative overflow-hidden rounded-lg border border-border hover:border-primary transition-all hover:shadow-lg"
                 >
                   <div className="aspect-[4/3] overflow-hidden">
                     <img
@@ -86,19 +86,19 @@ const AllCategoriesPage = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-white rounded-lg border border-gray-200">
-              <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                <IconFolder className="h-8 w-8 text-gray-400" />
+            <div className="text-center py-16 bg-card rounded-lg border border-border">
+              <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                <IconFolder className="h-8 w-8 text-muted-foreground" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 Aucune catégorie disponible
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 Les catégories seront bientôt disponibles.
               </p>
               <Link
                 to="/"
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors"
               >
                 <IconArrowLeft className="mr-2 h-4 w-4" />
                 Retour à l'accueil

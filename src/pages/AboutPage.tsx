@@ -15,15 +15,7 @@ const AboutPage = () => {
 
       {/* Hero Section */}
       <section className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <Link
-            to="/"
-            className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 mb-6"
-          >
-            <IconArrowLeft className="mr-2 h-4 w-4" />
-            Retour à l'accueil
-          </Link>
-
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             À propos de Mini Blog
           </h1>
@@ -36,7 +28,7 @@ const AboutPage = () => {
 
       {/* Content */}
       <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mission */}
           <div className="mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">

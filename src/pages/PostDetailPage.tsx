@@ -61,7 +61,7 @@ const PostDetailPage = () => {
         <>
           {/* Header */}
           <section className="bg-white border-b border-gray-200">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
               <Link
                 to="/"
                 className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 mb-6"
@@ -113,7 +113,7 @@ const PostDetailPage = () => {
           </section>
 
           {/* Content */}
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="grid gap-8 lg:grid-cols-4">
               {/* Main Content */}
               <article className="lg:col-span-3">
@@ -240,7 +240,7 @@ const PostDetailPage = () => {
           </div>
         </>
       ) : (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center py-16 bg-white rounded-lg border border-gray-200">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Article introuvable
