@@ -2,6 +2,12 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import Dashboard from "./pages/Dashboard";
+import CategoriesPage from "./pages/CategoriesPage";
+import CategoryPage from "./pages/CategoryPage";
+import AllCategoriesPage from "./pages/AllCategoriesPage";
+import PostDetailPage from "./pages/PostDetailPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import { AuthProvider } from "./components/AuthProvider";
 import { PrivateRoute } from "./components/PrivateRoute";
@@ -12,8 +18,13 @@ const App = () => {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Route d'accueil (public) */}
+          {/* Routes publiques */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/categories" element={<AllCategoriesPage />} />
+          <Route path="/category/:slug" element={<CategoryPage />} />
+          <Route path="/post/:slug" element={<PostDetailPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           
           {/* Route de connexion (seulement pour non-connectés) */}
           <Route
@@ -31,6 +42,16 @@ const App = () => {
             element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Route Catégories (protégée) */}
+          <Route
+            path="/dashboard/categories"
+            element={
+              <PrivateRoute>
+                <CategoriesPage />
               </PrivateRoute>
             }
           />

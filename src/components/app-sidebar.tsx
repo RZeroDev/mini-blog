@@ -1,17 +1,13 @@
 import * as React from "react"
 import {
   IconArticle,
-  IconChartBar,
   IconDashboard,
   IconFileText,
-  IconFolder,
   IconLogout,
-  IconNewSection,
   IconSettings,
   IconTags,
 } from "@tabler/icons-react"
 
-import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
@@ -33,55 +29,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     user: {
       name: user ? `${user.firstName} ${user.lastName}` : "Utilisateur",
       email: user?.email || "",
-      avatar: user?.picture || "",
+      avatar: "",
     },
     navMain: [
       {
-        title: "Dashboard",
+        title: "Tableau de bord",
         url: "/dashboard",
         icon: IconDashboard,
       },
       {
-        title: "Statistiques",
-        url: "/dashboard/stats",
-        icon: IconChartBar,
-      },
-    ],
-    articles: [
-      {
         title: "Articles",
-        icon: IconArticle,
-        isActive: true,
         url: "/dashboard/posts",
-        items: [
-          {
-            title: "Tous les articles",
-            url: "/dashboard/posts",
-          },
-          {
-            title: "Nouveau",
-            url: "/dashboard/posts/new",
-          },
-          {
-            title: "Brouillons",
-            url: "/dashboard/posts/drafts",
-          },
-        ],
+        icon: IconArticle,
       },
       {
         title: "Catégories",
-        icon: IconTags,
         url: "/dashboard/categories",
-        items: [
-          {
-            title: "Toutes",
-            url: "/dashboard/categories",
-          },
-          {
-            title: "Nouvelle",
-            url: "/dashboard/categories/new",
-          },
-        ],
+        icon: IconTags,
       },
     ],
     navSecondary: [
@@ -105,10 +69,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
               <a href="/dashboard">
-                <IconFileText className="!size-5" />
+                <IconFileText className="size-5!" />
                 <span className="text-base font-semibold">Mini Blog</span>
               </a>
             </SidebarMenuButton>
@@ -117,7 +81,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.articles} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
