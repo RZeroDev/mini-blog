@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BlogHeader } from "@/components/blog-header";
-import { IconFolder, IconClock, IconBookmark, IconHeart } from "@tabler/icons-react";
-import { getRecentPosts, getPostsPaginated, getPostsByCategoryPaginated } from "@/api/posts";
+import { IconFolder, IconClock, IconBookmark } from "@tabler/icons-react";
+import { getPostsPaginated, getPostsByCategoryPaginated } from "@/api/posts";
 import { getCategories } from "@/api/categories";
 import { apiUrl } from "@/api";
 import type { Post } from "@/api/posts";
@@ -15,11 +15,15 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+  const [isLoadingMoreRecent, setIsLoadingMoreRecent] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [postsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalPosts, setTotalPosts] = useState(0);
+  const [recentPostsPage, setRecentPostsPage] = useState(1);
+  const [recentPostsLimit] = useState(6);
+  const [hasMoreRecentPosts, setHasMoreRecentPosts] = useState(true);
 
   // Charger les données initiales
   useEffect(() => {
@@ -27,11 +31,12 @@ const HomePage = () => {
       try {
         setIsLoading(true);
         const [postsData, categoriesData] = await Promise.all([
-          getRecentPosts(6),
+          getPostsPaginated(1, recentPostsLimit),
           getCategories(),
         ]);
         console.log("Posts récupérés:", postsData);
-        setRecentPosts(postsData);
+        setRecentPosts(postsData.items);
+        setHasMoreRecentPosts(postsData.meta.page < postsData.meta.totalPages);
         const limitedCategories = categoriesData.slice(0, 8);
         setCategories(limitedCategories);
       } catch (error) {
@@ -42,7 +47,28 @@ const HomePage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [recentPostsLimit]);
+
+  // Fonction pour charger plus de posts récents
+  const loadMoreRecentPosts = async () => {
+    if (isLoadingMoreRecent || !hasMoreRecentPosts) {
+      return;
+    }
+
+    try {
+      setIsLoadingMoreRecent(true);
+      const nextPage = recentPostsPage + 1;
+      const result = await getPostsPaginated(nextPage, recentPostsLimit);
+      
+      setRecentPosts(prev => [...prev, ...result.items]);
+      setRecentPostsPage(nextPage);
+      setHasMoreRecentPosts(result.meta.page < result.meta.totalPages);
+    } catch (error) {
+      console.error("Erreur lors du chargement de plus de posts récents:", error);
+    } finally {
+      setIsLoadingMoreRecent(false);
+    }
+  };
 
   // Charger les posts par catégorie quand la catégorie change
   useEffect(() => {
@@ -265,7 +291,7 @@ const HomePage = () => {
               {/* Deuxième rangée : 3 articles */}
               {recentPosts.length > 2 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {recentPosts.slice(2, 5).map((post) => (
+                  {recentPosts.slice(2, 8).map((post) => (
                     <Link
                       key={post.id}
                       to={`/post/${post.slug || post.id}`}
@@ -311,7 +337,7 @@ const HomePage = () => {
           )}
         </section>
 
-        {/* Category Filtered Section - Grid Layout */}
+        {/* Category Filtered Section - Masonry Layout */}
         <section className="mb-16">
           <h2 className="text-4xl font-bold text-foreground text-center mb-8">
             {categories.find((c) => c.id === selectedCategory)?.name || "Tous les Articles"}
@@ -344,7 +370,7 @@ const HomePage = () => {
             ))}
           </div>
 
-          {/* Filtered Articles - Masonry Layout avec cartes aléatoires */}
+          {/* Filtered Articles - Masonry Layout */}
           {(isLoading || isLoadingPosts) ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(9)].map((_, i) => (
@@ -387,44 +413,40 @@ const HomePage = () => {
                         )}
                         <div>
                           <div className="font-semibold text-sm text-white">
-                            {author?.firstName?.toUpperCase()} {author?.lastName?.toUpperCase()}
+                            {author?.firstName} {author?.lastName}
                           </div>
-                          <div className="text-xs text-white/80">@{author?.firstName?.toLowerCase()}{author?.lastName?.[0]?.toLowerCase()}</div>
+                          <div className="text-xs text-white/70">@{author?.firstName?.toLowerCase()}</div>
                         </div>
                       </div>
-                      <p className="text-base italic text-white/95 leading-relaxed">
+                      <p className="text-lg italic text-white leading-relaxed font-medium">
                         "{getQuoteText(post.content)}"
                       </p>
                     </Link>
                   );
                 }
 
-                // Carte avec fond coloré - Plus grande
+                // Carte avec fond coloré (Texte uniquement ou dominant)
                 if (cardType === 'colored') {
                   return (
                     <Link
                       key={post.id}
                       to={`/post/${post.slug || post.id}`}
-                      className={`block mb-6 break-inside-avoid group ${cardColor} text-white rounded-xl overflow-hidden hover:shadow-2xl transition-all`}
+                      className={`block mb-6 break-inside-avoid group ${cardColor} text-white rounded-xl p-8 hover:shadow-2xl transition-all`}
                     >
-                      <div className="p-8">
-                        <div className="mb-3">
-                          <span className="text-xs font-bold text-white/80 uppercase tracking-wide">
-                            {post.category.name}
-                          </span>
-                        </div>
-                        <h3 className={`text-2xl font-bold text-white mb-4 ${lineClamp}`}>
-                          {post.title}
-                        </h3>
-                        <p className={`text-sm text-white/90 ${lineClamp} mb-6`}>
-                          {post.content.substring(0, textLength)}...
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <IconBookmark className="w-5 h-5 text-white/80" />
-                          <span className="text-sm font-medium text-white">
-                            Lire l'article
-                          </span>
-                        </div>
+                      <div className="mb-3 text-xs font-bold uppercase tracking-widest opacity-80">
+                        {post.category.name}
+                      </div>
+                      <h3 className={`text-2xl font-black mb-4 leading-tight ${lineClamp}`}>
+                        {post.title}
+                      </h3>
+                      <p className={`text-sm text-white/90 ${lineClamp} mb-6 leading-relaxed`}>
+                        {post.content.substring(0, textLength)}...
+                      </p>
+                      <div className="flex items-center justify-between mt-auto">
+                        <span className="text-xs font-bold bg-white/20 px-3 py-1 rounded-full">
+                          Lire l'article
+                        </span>
+                        <IconBookmark className="w-5 h-5 opacity-70" />
                       </div>
                     </Link>
                   );
@@ -436,7 +458,7 @@ const HomePage = () => {
                     <Link
                       key={post.id}
                       to={`/post/${post.slug || post.id}`}
-                      className={`block mb-6 break-inside-avoid group bg-card rounded-xl border border-border overflow-hidden hover:shadow-2xl transition-all`}
+                      className={`mb-6 break-inside-avoid group bg-card rounded-xl border border-border overflow-hidden hover:shadow-2xl transition-all flex flex-col`}
                     >
                       {post.image && (
                         <div className={`${imageHeight} overflow-hidden bg-muted`}>
@@ -478,20 +500,19 @@ const HomePage = () => {
                               {readingTime} min • {formatDate(post.createdAt)}
                             </div>
                           </div>
-                          <IconHeart className="w-5 h-5 text-muted-foreground" />
                         </div>
                       </div>
                     </Link>
                   );
                 }
 
-                // Carte featured avec fond coloré - Compacte
+                // Carte featured - Compacte avec fond émeraude
                 if (cardType === 'featured') {
                   return (
                     <Link
                       key={post.id}
                       to={`/post/${post.slug || post.id}`}
-                      className={`block mb-6 break-inside-avoid group bg-emerald-800 text-white rounded-xl overflow-hidden hover:shadow-2xl transition-all`}
+                      className={`mb-6 break-inside-avoid group bg-emerald-800 text-white rounded-xl overflow-hidden hover:shadow-2xl transition-all flex flex-col`}
                     >
                       <div className="p-6">
                         <h3 className="text-xl font-bold text-white mb-3 line-clamp-2">
@@ -508,12 +529,12 @@ const HomePage = () => {
                   );
                 }
 
-                // Carte image par défaut (style standard) - Hauteur variable
+                // Carte image standard - Classique (Moyenne)
                 return (
                   <Link
                     key={post.id}
                     to={`/post/${post.slug || post.id}`}
-                    className={`block mb-6 break-inside-avoid group bg-card rounded-xl border border-border overflow-hidden hover:shadow-2xl transition-all`}
+                    className={`mb-6 break-inside-avoid group bg-card rounded-xl border border-border overflow-hidden hover:shadow-2xl transition-all flex flex-col`}
                   >
                     {post.image ? (
                       <div className={`${imageHeight} overflow-hidden bg-muted`}>
@@ -524,53 +545,41 @@ const HomePage = () => {
                         />
                       </div>
                     ) : (
-                      <div className="h-48 bg-primary/10" />
+                      <div className={`${imageHeight} bg-primary/10 flex items-center justify-center`}>
+                        <IconFolder className="w-12 h-12 text-primary/20" />
+                      </div>
                     )}
                     
                     <div className="p-5">
                       <div className="mb-2">
-                        <span className="inline-block px-3 py-1 text-xs font-semibold text-primary bg-primary/10 rounded-full uppercase tracking-wide">
+                        <span className="inline-block px-3 py-1 text-[10px] font-bold text-primary bg-primary/10 rounded-md uppercase tracking-tighter">
                           {post.category.name}
                         </span>
                       </div>
                       
-                      <h3 className={`text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors ${lineClamp}`}>
+                      <h3 className={`text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors leading-snug ${lineClamp}`}>
                         {post.title}
                       </h3>
                       
-                      <p className={`text-sm text-muted-foreground mb-4 ${lineClamp}`}>
+                      <p className={`text-sm text-muted-foreground mb-4 leading-relaxed ${lineClamp}`}>
                         {post.content.substring(0, textLength)}...
                       </p>
                       
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between pt-4 border-t border-border/50">
                         <div className="flex items-center gap-2">
-                          {post.user?.picture ? (
-                            <img
-                              src={`${apiUrl}uploads/users/${post.user.picture}`}
-                              alt={`${author?.firstName} ${author?.lastName}`}
-                              className="w-8 h-8 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                              <span className="text-xs font-semibold text-primary">
-                                {author?.firstName?.[0] || 'A'}
-                              </span>
-                            </div>
-                          )}
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium text-foreground">
-                              {author?.firstName} {author?.lastName}
-                            </span>
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <IconClock className="w-3 h-3" />
-                              <span>{readingTime} min</span>
-                            </div>
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden text-[10px] font-bold text-primary">
+                            {post.user?.picture ? (
+                              <img src={`${apiUrl}uploads/users/${post.user.picture}`} className="w-full h-full object-cover" alt="" />
+                            ) : author?.firstName?.[0]}
                           </div>
+                          <span className="text-xs font-medium text-foreground/80 truncate max-w-[80px]">
+                            {author?.firstName}
+                          </span>
                         </div>
-                        
-                        <span className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors inline-block">
-                          Lire l'article
-                        </span>
+                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
+                          <IconClock className="w-3 h-3" />
+                          <span>{readingTime} min</span>
+                        </div>
                       </div>
                     </div>
                   </Link>
