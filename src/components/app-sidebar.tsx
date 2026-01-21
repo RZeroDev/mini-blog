@@ -4,7 +4,6 @@ import {
   IconDashboard,
   IconFileText,
   IconLogout,
-  IconSettings,
   IconTags,
   IconExternalLink,
   IconActivity,
@@ -58,11 +57,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
     ],
     navSecondary: [
-      {
-        title: "Paramètres",
-        url: "/dashboard/settings",
-        icon: IconSettings,
-      },
       {
         title: "Déconnexion",
         url: "/logout",

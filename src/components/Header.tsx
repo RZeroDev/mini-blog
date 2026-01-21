@@ -1,18 +1,21 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   IconMenu2,
   IconX,
   IconSearch,
   IconChevronDown,
 } from "@tabler/icons-react";
-import { useAppSelector } from "@/store/hooks";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { logout } from "@/store/slices/authSlice";
 import { getCategories } from "@/api/categories";
 import type { Category } from "@/api/categories";
 import { apiUrl } from "@/api";
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,6 +24,13 @@ export function Header() {
   
   const isActive = (path: string) => location.pathname === path;
   const isCategoryPath = location.pathname.startsWith('/category') || location.pathname === '/categories';
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    dispatch(logout());
+    setIsUserMenuOpen(false);
+    navigate("/login");
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -189,14 +199,14 @@ export function Header() {
                       <span>Tableau de bord</span>
                       <span className="ml-auto text-muted-foreground group-hover/item:text-foreground transition-colors">→</span>
                     </Link>
-                    <Link
-                      to="/logout"
+                    <a
+                      href="#"
                       className="flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50/80 transition-colors group/item"
-                      onClick={() => setIsUserMenuOpen(false)}
+                      onClick={handleLogout}
                     >
                       <span>Se déconnecter</span>
                       <span className="ml-auto text-red-400 group-hover/item:text-red-600 transition-colors">→</span>
-                    </Link>
+                    </a>
                   </div>
                 )}
               </div>
@@ -294,7 +304,27 @@ export function Header() {
                 Contact
               </Link>
 
-              {!isAuthenticated && (
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="block px-4 py-3 text-sm font-semibold text-foreground hover:bg-muted rounded-lg transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Tableau de bord
+                  </Link>
+                  <a
+                    href="#"
+                    className="block px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50/80 rounded-lg transition-colors"
+                    onClick={(e) => {
+                      handleLogout(e);
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Se déconnecter
+                  </a>
+                </>
+              ) : (
                 <Link
                   to="/login"
                   className="block mx-4 mt-4 px-4 py-3 text-sm font-semibold text-center text-primary-foreground bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 rounded-lg transition-all duration-200 shadow-md"
