@@ -7,7 +7,7 @@ export interface LoginCredentials {
 }
 
 export interface LoginResponse {
-  access_token: string;
+  accessToken: string;
   user: {
     id: string;
     email: string;
@@ -48,8 +48,8 @@ export const login = async (
     const data: LoginResponse = await response.json();
 
     // Stocker le token dans le localStorage
-    if (data.access_token) {
-      localStorage.setItem("token", data.access_token);
+    if (data.accessToken) {
+      localStorage.setItem("token", data.accessToken);
       localStorage.setItem("user", JSON.stringify(data.user));
     }
 

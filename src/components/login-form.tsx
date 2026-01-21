@@ -19,6 +19,9 @@ import * as Yup from "yup"
 import { login } from "@/api/auth"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
+import { useAppDispatch } from "@/store/hooks"
+import { setCredentials } from "@/store/slices/authSlice"
 
 // Schéma de validation Yup
 const loginSchema = Yup.object({
@@ -35,6 +38,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const [errorMessage, setErrorMessage] = useState<string>("")
 
   // Configuration Formik
@@ -48,21 +52,41 @@ export function LoginForm({
       try {
         setErrorMessage("")
         const data = await login(values)
-        console.log("Connexion réussie:", data)
+        
+        // Sauvegarder les données dans Redux
+        dispatch(
+          setCredentials({
+            user: data.user,
+            token: data.accessToken,
+          })
+        )
+        
+        // Toast de succès
+        toast.success("Connexion réussie", {
+          description: `Bienvenue ${data.user.firstName} ${data.user.lastName}`,
+        })
 
         // Rediriger vers la page d'accueil ou admin selon le rôle
-        if (data.user.role.name === "admin") {
-          navigate("/admin")
-        } else {
-          navigate("/")
-        }
+        setTimeout(() => {
+          if (data.user.role.name === "admin") {
+            navigate("/admin")
+          } else {
+            navigate("/")
+          }
+        }, 1000)
       } catch (error) {
         console.error("Erreur de connexion:", error)
-        setErrorMessage(
+        const errorMsg =
           error instanceof Error
             ? error.message
             : "Erreur de connexion. Veuillez réessayer."
-        )
+        
+        setErrorMessage(errorMsg)
+        
+        // Toast d'erreur
+        toast.error("Échec de connexion", {
+          description: errorMsg,
+        })
       }
     },
   })
