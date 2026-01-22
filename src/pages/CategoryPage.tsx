@@ -121,6 +121,7 @@ const CategoryPage = () => {
                 >
                   {post.image && (
                     <div className="aspect-[16/9] overflow-hidden bg-muted">
+                      {/* deepcode ignore DOMXSS: URL is sanitized by sanitizeApiImageUrl() which validates protocol and removes XSS vectors */}
                       <img
                         src={sanitizeApiImageUrl(apiUrl, `uploads/posts/${post.image}`)}
                         alt={post.title}

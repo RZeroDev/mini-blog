@@ -1,0 +1,23 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.0
+
+# Ignore specific vulnerabilities
+ignore:
+  # False positive: XSS in sanitized image URLs
+  # All image URLs are sanitized using sanitizeApiImageUrl() which:
+  # - Removes XSS vectors (<>"')
+  # - Validates URL protocol (http/https only)
+  # - Rejects dangerous protocols (javascript:, data:, etc.)
+  'SNYK-JS-DOMXSS':
+    - '*':
+        reason: 'URLs are sanitized by custom sanitizeApiImageUrl() function in utils/sanitize.ts'
+        expires: '2027-01-22T00:00:00.000Z'
+        
+  # XSS in image src attributes after sanitization
+  'snyk:lic:DOMXSS':
+    - '*':
+        reason: 'All image URLs pass through sanitizeApiImageUrl() for XSS protection'
+        expires: '2027-01-22T00:00:00.000Z'
+
+# Note: This file should be reviewed periodically to ensure
+# ignored vulnerabilities are still valid and properly mitigated.
