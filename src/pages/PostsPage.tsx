@@ -72,6 +72,7 @@ import { getCategories } from "@/api/categories";
 import type { Post, PaginationMeta, UpdatePostDto } from "@/api/posts";
 import type { Category } from "@/api/categories";
 import { apiUrl } from "@/api";
+import { sanitizeApiImageUrl } from "@/utils/sanitize";
 import { toast } from "sonner";
 
 // Schéma de validation pour création
@@ -393,7 +394,7 @@ export default function PostsPage() {
                         <div className="relative h-48 bg-muted overflow-hidden">
                           {post.image ? (
                             <img
-                              src={`${apiUrl}uploads/posts/${post.image}`}
+                              src={sanitizeApiImageUrl(apiUrl, `uploads/posts/${post.image}`)}
                               alt={post.title}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />

@@ -11,6 +11,7 @@ import { getCategories } from "@/api/categories";
 import { apiUrl } from "@/api";
 import type { Post } from "@/api/posts";
 import type { Category } from "@/api/categories";
+import { sanitizeApiImageUrl } from "@/utils/sanitize";
 
 const CategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -121,7 +122,7 @@ const CategoryPage = () => {
                   {post.image && (
                     <div className="aspect-[16/9] overflow-hidden bg-muted">
                       <img
-                        src={`${apiUrl}uploads/posts/${post.image}`}
+                        src={sanitizeApiImageUrl(apiUrl, `uploads/posts/${post.image}`)}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />

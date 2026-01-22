@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { BlogHeader } from "@/components/blog-header";
 import {
@@ -13,11 +13,17 @@ import {
 import { getPostBySlug, incrementPostViews } from "@/api/posts";
 import { apiUrl } from "@/api";
 import type { Post } from "@/api/posts";
+import { sanitizeHTML, sanitizeApiImageUrl } from "@/utils/sanitize";
 
 const PostDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Sanitize HTML content to prevent XSS
+  const sanitizedContent = useMemo(() => {
+    return post?.content ? sanitizeHTML(post.content) : '';
+  }, [post?.content]);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -125,7 +131,7 @@ const PostDetailPage = () => {
                 {post.image && (
                   <div className="relative h-96 rounded-xl overflow-hidden mb-8 border border-gray-200">
                     <img
-                      src={`${apiUrl}uploads/posts/${post.image}`}
+                      src={sanitizeApiImageUrl(apiUrl, `uploads/posts/${post.image}`)}
                       alt={post.title}
                       className="w-full h-full object-cover"
                     />
@@ -134,7 +140,7 @@ const PostDetailPage = () => {
 
                 <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-gray-900 prose-strong:text-gray-900">
                   <div
-                    dangerouslySetInnerHTML={{ __html: post.content }}
+                    dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                   />
                 </div>
 
@@ -199,7 +205,7 @@ const PostDetailPage = () => {
                     >
                       <div className="relative h-32 rounded-lg overflow-hidden mb-3 border border-gray-200">
                         <img
-                          src={post.category.image}
+                          src={sanitizeApiImageUrl(apiUrl, post.category.image)}
                           alt={post.category.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />

@@ -98,7 +98,7 @@ export const getLogsByUser = async (
 /**
  * Nettoyer les anciens logs
  */
-export const cleanupOldLogs = async (days: number = 90): Promise<any> => {
+export const cleanupOldLogs = async (days: number = 90): Promise<{ statusCode: number; message: string; data?: { deletedCount: number } }> => {
   const response = await fetch(
     buildUrl(`logs/cleanup?days=${days}`),
     {

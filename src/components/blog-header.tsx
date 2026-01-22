@@ -10,6 +10,7 @@ import { useAppSelector } from "@/store/hooks";
 import { getCategories } from "@/api/categories";
 import type { Category } from "@/api/categories";
 import { apiUrl } from "@/api";
+import { sanitizeApiImageUrl } from "@/utils/sanitize";
 
 export function BlogHeader() {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
@@ -80,7 +81,7 @@ export function BlogHeader() {
                         >
                           <div className="relative overflow-hidden rounded-lg">
                           <img
-                              src={apiUrl + category.image}
+                              src={sanitizeApiImageUrl(apiUrl, category.image)}
                             alt={category.name}
                               className="h-10 w-10 object-cover group-hover/item:scale-110 transition-transform duration-300"
                           />
@@ -225,7 +226,7 @@ export function BlogHeader() {
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <img
-                        src={apiUrl + category.image}
+                        src={sanitizeApiImageUrl(apiUrl, category.image)}
                         alt={category.name}
                         className="h-8 w-8 rounded-lg object-cover"
                       />

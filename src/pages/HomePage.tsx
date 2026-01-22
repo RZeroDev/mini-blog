@@ -6,6 +6,7 @@ import { getCategories } from "@/api/categories";
 import { apiUrl } from "@/api";
 import type { Post } from "@/api/posts";
 import type { Category } from "@/api/categories";
+import { sanitizeApiImageUrl } from "@/utils/sanitize";
 
 const HomePage = () => {
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
@@ -231,7 +232,7 @@ const HomePage = () => {
                       {post.image && (
                         <div className="aspect-video overflow-hidden bg-muted">
                           <img
-                            src={`${apiUrl}uploads/posts/${post.image}`}
+                            src={sanitizeApiImageUrl(apiUrl, `uploads/posts/${post.image}`)}
                             alt={post.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
@@ -272,7 +273,7 @@ const HomePage = () => {
                       {post.image && (
                         <div className="aspect-video overflow-hidden bg-muted">
                           <img
-                            src={`${apiUrl}uploads/posts/${post.image}`}
+                            src={sanitizeApiImageUrl(apiUrl, `uploads/posts/${post.image}`)}
                             alt={post.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
@@ -372,7 +373,7 @@ const HomePage = () => {
                       <div className="flex items-start gap-3 mb-4">
                         {post.user?.picture ? (
                           <img
-                            src={`${apiUrl}uploads/users/${post.user.picture}`}
+                            src={sanitizeApiImageUrl(apiUrl, `uploads/users/${post.user.picture}`)}
                             alt={`${author?.firstName} ${author?.lastName}`}
                             className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
                           />
@@ -435,7 +436,7 @@ const HomePage = () => {
                       {post.image && (
                         <div className={`${imageHeight} overflow-hidden bg-muted`}>
                           <img
-                            src={`${apiUrl}uploads/posts/${post.image}`}
+                            src={sanitizeApiImageUrl(apiUrl, `uploads/posts/${post.image}`)}
                             alt={post.title}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           />
@@ -453,7 +454,7 @@ const HomePage = () => {
                         <div className="flex items-center gap-3 mt-3">
                           {post.user?.picture ? (
                             <img
-                              src={`${apiUrl}uploads/users/${post.user.picture}`}
+                              src={sanitizeApiImageUrl(apiUrl, `uploads/users/${post.user.picture}`)}
                               alt={`${author?.firstName} ${author?.lastName}`}
                               className="w-8 h-8 rounded-full object-cover"
                             />
@@ -511,7 +512,7 @@ const HomePage = () => {
                     {post.image ? (
                       <div className={`${imageHeight} overflow-hidden bg-muted`}>
                         <img
-                          src={`${apiUrl}uploads/posts/${post.image}`}
+                          src={sanitizeApiImageUrl(apiUrl, `uploads/posts/${post.image}`)}
                           alt={post.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
@@ -541,7 +542,7 @@ const HomePage = () => {
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden text-[10px] font-bold text-primary">
                             {post.user?.picture ? (
-                              <img src={`${apiUrl}uploads/users/${post.user.picture}`} className="w-full h-full object-cover" alt="" />
+                              <img src={sanitizeApiImageUrl(apiUrl, `uploads/users/${post.user.picture}`)} className="w-full h-full object-cover" alt="" />
                             ) : author?.firstName?.[0]}
                           </div>
                           <span className="text-xs font-medium text-foreground/80 truncate max-w-[80px]">

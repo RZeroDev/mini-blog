@@ -17,6 +17,7 @@ import {
 import { IconEdit, IconTrash, IconSearch, IconLoader } from "@tabler/icons-react";
 import type { Category } from "@/api/categories";
 import { apiUrl } from "@/api";
+import { sanitizeApiImageUrl } from "@/utils/sanitize";
 
 interface CategoriesGridProps {
   categories: Category[];
@@ -100,7 +101,7 @@ export function CategoriesGrid({
                 {/* Image */}
                 <div className="relative h-48 bg-muted overflow-hidden">
                   <img
-                    src={`${apiUrl}${category.image}`}
+                    src={sanitizeApiImageUrl(apiUrl, category.image)}
                     alt={category.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
