@@ -39,7 +39,7 @@ export const sanitizeImageUrl = (url: string | undefined | null): string => {
     
     // Invalid protocol, return empty string
     return '';
-  } catch (e) {
+  } catch (_e) {
     // If URL parsing fails, it might be a relative path
     if (sanitized.startsWith('/') || sanitized.startsWith('uploads/')) {
       return sanitized;
