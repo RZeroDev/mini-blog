@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BlogHeader } from "@/components/blog-header";
 import { IconArrowLeft, IconFolder } from "@tabler/icons-react";
 import { getCategories } from "@/api/categories";
 import type { Category } from "@/api/categories";
